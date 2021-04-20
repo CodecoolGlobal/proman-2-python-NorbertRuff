@@ -19,6 +19,16 @@ export let dataHandler = {
     _api_post: function (url, data, callback) {
         // it is not called from outside
         // sends the data to the API, and calls callback function
+        fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(json_response => callback(json_response));
     },
     init: function () {
     },
@@ -49,6 +59,13 @@ export let dataHandler = {
         return new Promise ((resolve, reject) => {
             this._api_get('/get-cards', (response) => {
             this._data['cards'] = response;
+            resolve(response)
+        });
+    })
+    },
+    boardNameChange: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/save-new-name', data,(response) => {
             resolve(response)
         });
     })
