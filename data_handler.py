@@ -37,12 +37,19 @@ def get_default_statuses(cursor):
     return cursor.fetchall()
 
 
-def get_cards_for_board(board_id):
-    persistence.clear_cache()
-    all_cards = persistence.get_cards()
-    matching_cards = []
-    for card in all_cards:
-        if card['board_id'] == str(board_id):
-            card['status_id'] = get_card_status(card['status_id'])  # Set textual status for the card
-            matching_cards.append(card)
-    return matching_cards
+@connection.connection_handler
+def get_all_cards(cursor, username):
+    query = """
+    SELECT c.id, c.title, c.board_id, c.status_id, c.archived, c.card_order
+    FROM cards c
+    JOIN boards b
+        ON c.board_id = b.id
+    LEFT JOIN users u
+        ON b.user_id = u.id
+    WHERE b.user_id IS NULL OR u.name = %(username)s
+    ORDER BY c.id
+    """
+    var = {'username': username}
+    cursor.execute(query, var)
+    return cursor.fetchall()
+

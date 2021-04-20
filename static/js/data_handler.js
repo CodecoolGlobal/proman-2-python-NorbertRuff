@@ -29,24 +29,27 @@ export let dataHandler = {
             resolve(response)
             // callback(response);
         });
-        })
-        // the boards are retrieved and then the callback function is called with the boards
-
-        // Here we use an arrow function to keep the value of 'this' on dataHandler.
-        //    if we would use function(){...} here, the value of 'this' would change.
-        // this._api_get('/get-boards', (response) => {
-        //     this._data['boards'] = response;
-        //     callback(response);
-        // });
+    })
     },
+
     getBoard: function (boardId, callback) {
         // the board is retrieved and then the callback function is called with the board
     },
+
     getDefaultStatuses: function () {
         return new Promise ((resolve, reject) => {
             this._api_get('/get-default-statuses', (response) => {
             resolve(response)
             // callback(response);
+        });
+    })
+    },
+
+    getCards: function () {
+        return new Promise ((resolve, reject) => {
+            this._api_get('/get-cards', (response) => {
+            this._data['cards'] = response;
+            resolve(response)
         });
     })
     },

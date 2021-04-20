@@ -14,7 +14,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route("/get-boards/")
+@app.route("/get-boards")
 @json_response
 def get_boards():
     """
@@ -30,19 +30,14 @@ def get_default_statuses():
     """
     All default statuses
     """
-    print(data_handler.get_default_statuses())
     return data_handler.get_default_statuses()
 
 
-
-@app.route("/get-cards/<int:board_id>")
+@app.route("/get-cards")
 @json_response
-def get_cards_for_board(board_id: int):
-    """
-    All cards that belongs to a board
-    :param board_id: id of the parent board
-    """
-    return data_handler.get_cards_for_board(board_id)
+def get_all_cards():
+    username = session.get('username', 'test@password.com')
+    return data_handler.get_all_cards(username)
 
 
 def main():

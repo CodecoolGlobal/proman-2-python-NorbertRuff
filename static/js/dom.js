@@ -10,11 +10,14 @@ export let dom = {
         // retrieves boards and makes showBoards called
         let promise1 = dataHandler.getBoards()
         let promise2 = dataHandler.getDefaultStatuses()
-        Promise.all([promise1, promise2]).then((data) => {
+        let promise3 = dataHandler.getCards()
+        Promise.all([promise1, promise2, promise3]).then((data) => {
             let boards = data[0]
             let defaultStatuses = data[1]
+            let cards = data[2]
             dom.showBoards(boards);
             dom.showDefaultStatuses(defaultStatuses);
+            dom.showCards(cards);
         })
 
     },
@@ -24,7 +27,7 @@ export let dom = {
         boardsContainer.classList.add('board-container')
         for (let board of boards){
             boardsContainer.insertAdjacentHTML('beforeend', `
-            <section class="board" data-board-id="${board['id']}">
+            <section id="board-id-${board['id']}" class="board" data-board-id="${board['id']}">
                 <div class="board-header"><span class="board-title">${board['title']}</span>
                     <button class="board-add">Add Card</button>
                     <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
@@ -33,7 +36,7 @@ export let dom = {
             </section>
             ` );
         }
-  },
+    },
 
     showDefaultStatuses: function (defaultStatuses) {
         let boardsContainer = document.querySelector('#boards');
@@ -44,18 +47,23 @@ export let dom = {
                 columnContent.insertAdjacentHTML('beforeend', `
                 <div class="board-column">
                 <div class="board-column-title">${status['title']}</div>
-                <div class="board-column-content"></div>
+                <div id="status-id-${status['id']}" class="board-column-content" data-status-id="${status['id']}"></div>
                     </div>`)
             }
         }
     },
 
-    loadCards: function (boardId) {
-        // retrieves cards and makes showCards called
-    },
     showCards: function (cards) {
-        // shows the cards of a board
-        // it adds necessary event listeners also
+       for (let card of cards) {
+           let board = document.querySelector(`#board-id-${card.board_id}`)
+           let column = board.querySelector(`#status-id-${card.status_id}`)
+           column.insertAdjacentHTML('beforeend', `
+                <div class="card">
+                    <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
+                    <div class="card-title">${card.title}</div>
+                </div>
+           `)
+       }
     },
-    // here comes more features
+
 };
