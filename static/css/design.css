@@ -127,3 +127,70 @@ section.board{
 .card-title{
     padding-right: 16px;
 }
+/*--------------------------modal-----------------------------*/
+.bg-modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+/* Modal Content/Box */
+.modal {
+    text-align: center;
+    align-content: center;
+    justify-content: center;
+    margin: 15% auto;
+    padding: 20px;
+    width: 60%;
+    border: black;
+    background-color: aliceblue;
+}
+/*--------------------------modal-----------------------------*/
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 20px;
+  font-weight: bold;
+}
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 45px;
+  font-weight: bold;
+    padding-right: 10px;
+}
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-primary {
+  color: #fff;
+  background-color: #3679fe;
+  border-color: #fed136;
+}
+.btn-primary:hover {
+  color: #fff;
+  background-color: #fec810;
+  border-color: #fec503;
+}
+.btn-primary:focus, .btn-primary.focus {
+  color: #fff;
+  background-color: #fec810;
+  border-color: #fec503;
+  box-shadow: 0 0 0 0.2rem rgba(254, 216, 84, 0.5);
+}
