@@ -13,13 +13,25 @@ def get_card_status(status_id):
 
 
 @connection.connection_handler
+def save_new_table_name(cursor, new_name, id):
+    query = """
+        UPDATE boards 
+        SET title = %(title)s
+        WHERE id = %(id)s    
+    """
+    var = {'title': new_name, 'id': id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
 def get_boards(cursor, username):
     query = """
             SELECT boards.id, boards.title
             FROM boards
             LEFT JOIN users
                  ON boards.user_id = users.id
-            WHERE users.name = %(username)s OR boards.user_id IS NULL;
+            WHERE users.name = %(username)s OR boards.user_id IS NULL
+            ORDER BY id;
             """
     var = {'username': username}
     cursor.execute(query, var)
