@@ -24,6 +24,16 @@ def get_boards():
     return data_handler.get_boards(username)
 
 
+@app.route("/get-default-statuses")
+@json_response
+def get_default_statuses():
+    """
+    All default statuses
+    """
+    print(data_handler.get_default_statuses())
+    return data_handler.get_default_statuses()
+
+
 
 @app.route("/get-cards/<int:board_id>")
 @json_response

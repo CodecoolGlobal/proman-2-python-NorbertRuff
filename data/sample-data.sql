@@ -24,7 +24,8 @@ CREATE TABLE boards (
 
 CREATE TABLE statuses(
     id SERIAL NOT NULL,
-    title VARCHAR
+    title VARCHAR,
+    is_default boolean DEFAULT false
 );
 
 CREATE TABLE cards(
@@ -63,11 +64,11 @@ INSERT INTO boards (id, title, user_id) VALUES(2, 'Board 2', null);
 SELECT pg_catalog.setval('boards_id_seq', 2, true);
 
 
-INSERT INTO statuses (id, title) VALUES(0, 'new');
-INSERT INTO statuses (id, title) VALUES(1, 'in progress');
-INSERT INTO statuses (id, title) VALUES(2, 'testing');
-INSERT INTO statuses (id, title) VALUES(3, 'done');
-INSERT INTO statuses (id, title) VALUES(4, 'hello');
+INSERT INTO statuses (id, title, is_default) VALUES(0, 'new', true);
+INSERT INTO statuses (id, title, is_default) VALUES(1, 'in progress', true);
+INSERT INTO statuses (id, title, is_default) VALUES(2, 'testing', true);
+INSERT INTO statuses (id, title, is_default) VALUES(3, 'done', true);
+INSERT INTO statuses (id, title, is_default) VALUES(4, 'hello', false);
 SELECT pg_catalog.setval('statuses_id_seq', 4, true);
 
 
