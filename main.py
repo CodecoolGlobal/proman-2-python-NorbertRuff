@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, session
 from util import json_response
 
 import data_handler
@@ -14,13 +14,15 @@ def index():
     return render_template('index.html')
 
 
-@app.route("/get-boards")
+@app.route("/get-boards/")
 @json_response
 def get_boards():
     """
     All the boards
     """
-    return data_handler.get_boards()
+    username = session.get('username', 'test@password.com')
+    return data_handler.get_boards(username)
+
 
 
 @app.route("/get-cards/<int:board_id>")

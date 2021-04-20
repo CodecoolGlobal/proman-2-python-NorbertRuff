@@ -1,4 +1,5 @@
 import persistence
+import connection
 
 
 def get_card_status(status_id):
@@ -11,12 +12,18 @@ def get_card_status(status_id):
     return next((status['title'] for status in statuses if status['id'] == str(status_id)), 'Unknown')
 
 
-def get_boards():
-    """
-    Gather all boards
-    :return:
-    """
-    return persistence.get_boards(force=True)
+@connection.connection_handler
+def get_boards(cursor, username):
+    query = """
+            SELECT boards.id, boards.title
+            FROM boards
+            LEFT JOIN users
+                 ON boards.user_id = users.id
+            WHERE users.name = %(username)s OR boards.user_id IS NULL;
+            """
+    var = {'username': username}
+    cursor.execute(query, var)
+    return cursor.fetchall()
 
 
 def get_cards_for_board(board_id):

@@ -14,23 +14,35 @@ export let dom = {
     showBoards: function (boards) {
         // shows boards appending them to #boards div
         // it adds necessary event listeners also
-
-        let boardList = '';
-
-        for(let board of boards){
-            boardList += `
-                <li>${board.title}</li>
-            `;
+        console.log(boards)
+        let boardsContainer = document.querySelector('#boards');
+        for (let board of boards){
+            boardsContainer.insertAdjacentHTML('beforeend', `
+            <section class="board" data-board-id="${board['id']}">
+                <div class="board-header"><span class="board-title">Board 1</span>
+                    <button class="board-add">Add Card</button>
+                    <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
+                </div>
+            </section>
+            ` );
         }
 
-        const outerHtml = `
-            <ul class="board-container">
-                ${boardList}
-            </ul>
-        `;
+        // let boardList = '';
+        //
+        // for(let board of boards){
+        //     boardList += `
+        //         <li>${board.title}</li>
+        //     `;
+        // }
+        //
+        // const outerHtml = `
+        //     <ul class="board-container">
+        //         ${boardList}
+        //     </ul>
+        // `;
 
-        let boardsContainer = document.querySelector('#boards');
-        boardsContainer.insertAdjacentHTML("beforeend", outerHtml);
+
+        // boardsContainer.insertAdjacentHTML("beforeend", outerHtml);
     },
     loadCards: function (boardId) {
         // retrieves cards and makes showCards called

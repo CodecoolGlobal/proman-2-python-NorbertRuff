@@ -31,6 +31,7 @@ def _get_data(data_type, file, force):
     """
     if force or data_type not in _cache:
         _cache[data_type] = _read_csv(file)
+        print(_cache[data_type])
     return _cache[data_type]
 
 
