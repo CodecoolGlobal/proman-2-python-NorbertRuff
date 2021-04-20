@@ -3,7 +3,8 @@ import { dataHandler } from "./data_handler.js";
 
 export let dom = {
     init: function () {
-
+        let addNewPublicBoardBTN = document.querySelector("#add_public_board");
+        addNewPublicBoardBTN.addEventListener('click', addNewPBoard);
         // This function should run once, when the page is loaded.
     },
     loadBoards: function () {
@@ -67,3 +68,53 @@ export let dom = {
     },
 
 };
+
+// Main function for setting up, creating, saving new board
+function addNewPBoard(){
+    const modal = document.querySelector(".bg-modal");
+    const closeSpan = document.querySelector(".close");
+    createModal()
+    modal.style.display = "block";
+    closeSpan.onclick = function() {modal.style.display = "none";}
+    window.onclick = function(event) {if (event.target == modal) modal.style.display = "none";}
+    document.querySelector('#save_new_title').onclick = function() {
+        let customTitle = document.querySelector('#new_title')
+        createNewPBoard(customTitle.value);
+        modal.style.display = "none";
+    }
+    saveNewBoardToDB()
+}
+
+// Creates modal element
+function createModal(){
+    let modalContent = document.querySelector('.modal-content')
+    modalContent.innerHTML = '';
+    modalContent.insertAdjacentHTML('afterbegin', ` 
+            <label for="new_title">Add title for new board</label>
+            <br><br>
+            <input type="text" name="new_title" id="new_title">
+            <br><br>
+    `);
+    document.querySelector('.modal-footer').innerHTML='<button id="save_new_title">Save</button>';
+}
+
+// Creates new public board with title adds after last board
+function createNewPBoard(customTitle){
+        let boards = document.querySelectorAll('section');
+        let lastBoard = document.querySelector('section:last-child');
+        lastBoard.insertAdjacentHTML('afterend', `
+                <section id="board-id-${boards.length + 1}" class="board" data-board-id="${boards.length + 1}">
+                    <div class="board-header"><span class="board-title">${customTitle}</span>
+                        <button class="board-add">Add Card</button>
+                        <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="board-columns"></div>
+                </section>
+            `);
+}
+
+// Saves new board to DB
+function saveNewBoardToDB(){
+
+}
+
