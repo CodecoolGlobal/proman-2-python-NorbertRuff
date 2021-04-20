@@ -62,7 +62,7 @@ export let dom = {
         document.querySelector('.modal-content').insertAdjacentHTML(
             'beforeend',
             `<h2>Change board name</h2>
-                  <input id="${boardID}" class="modalInput" value="test123" placeholder="${boardName}">`)
+                  <input id="${boardID}" class="modalInput" placeholder="${boardName}">`)
         document.querySelector('#saveChanges').addEventListener('click', this.saveBoardNameChange)
 
     },

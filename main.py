@@ -14,13 +14,15 @@ def index():
     return render_template('index.html')
 
 
-@json_response
 @app.route("/save-new-name", methods=["POST"])
 def save_new_name():
     new_name = request.get_json()['board_name']
     board_id = request.get_json()['id']
-    data_handler.save_new_table_name(new_name, board_id)
-    return jsonify({"response": "OK"})
+    try:
+        data_handler.save_new_table_name(new_name, board_id)
+        return jsonify({"response": "OK"})
+    except:
+        return jsonify({"response": "There was an error during execution of your request"})
 
 
 @app.route("/get-boards")
