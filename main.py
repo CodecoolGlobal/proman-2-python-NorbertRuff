@@ -1,10 +1,12 @@
 from flask import Flask, render_template, url_for, session, request, jsonify
 from util import json_response
+import password_hasher
 
 import data_handler
 
 app = Flask(__name__)
 
+app.config['SECRET_KEY'] = "bec725156bb840a9a722fba8b3a7597b"
 
 @app.route("/")
 def index():
@@ -108,6 +110,16 @@ def update_cards():
         return jsonify({"response": "OK"})
     except:
         return jsonify({"response": "There was an error during execution of your request"})
+
+
+
+@app.route("/register", methods=["POST", "GET"])
+def register():
+    new_username = request.get_json()['new_username']
+    new_password = password_hasher.hash_password(request.get_json()['new_password'])
+    data_handler.add_new_user(new_username, new_password)
+    return ""
+
 
 
 def main():

@@ -119,6 +119,14 @@ export let dataHandler = {
              resolve(response)
         });
         });
-    }
+    },
     // here comes more features
+    createNewUser: function (new_username, new_password, callback){
+        let data = {'new_username': new_username, 'new_password': new_password}
+        return new Promise ((resolve, reject) => {
+            this._api_post('/register', data,(response) => {
+            resolve(response)
+        });
+    })
+    }
 };

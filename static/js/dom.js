@@ -5,6 +5,7 @@ export let dom = {
     focusTarget: '',
     // This function should run once, when the page is loaded.
     init: function () {
+        dom.initRegistrationForm();
         dom.initNewPublicBoardButton();
         dom.initInputClose();
         dom.initModalClose();
@@ -368,6 +369,43 @@ export let dom = {
                             <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
                             <div class="card-title">${customTitle}</div>
                             </div>`);
+        },
+
+        initRegistrationForm: function() {
+            document.body.insertAdjacentHTML("afterbegin", "<h3 id='sign-up'>Sign up</h3>")
+            document.getElementById("sign-up").addEventListener('click', dom.showRegistrationForm)
+        },
+
+
+        createRegistrationModal: function(){
+            let modalContent = document.querySelector('.modal-content')
+            modalContent.innerHTML = '';
+            modalContent.insertAdjacentHTML('beforeend', `
+                  <h2>Please enter your username and password</h2>
+                  <label for="new_username">Username:</label>
+                  <input id="new_username" class="modalInput"><br>
+                  <label for="new_username">Password:</label>
+                  <input id="new_password" class="modalInput">
+            `);
+        },
+
+        showRegistrationForm: function() {
+            dom.showModal()
+            dom.createRegistrationModal()
+            dom.initRegistrationSubmit()
+        },
+
+        initRegistrationSubmit: function() {
+            document.querySelector('#saveChanges').onclick = function() {
+                dom.getDataFromRegistrationForm();
+            }
+        },
+
+        getDataFromRegistrationForm: function() {
+            let new_username = document.getElementById("new_username").value
+            let new_password = document.getElementById("new_password").value
+            dom.closeModal()
+            dataHandler.createNewUser(new_username, new_password).then(dom.loadBoards)
         }
 };
 
