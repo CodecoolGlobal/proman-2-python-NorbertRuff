@@ -6,7 +6,7 @@ export let dom = {
         let addNewPublicBoardBTN = document.querySelector("#add_public_board");
         addNewPublicBoardBTN.addEventListener('click', addNewPBoard);
         // This function should run once, when the page is loaded.
-        // document.querySelector('.close').addEventListener('click', this.closeModal) ////// TODO does this do???
+        document.querySelector('.close').addEventListener('click', this.closeModal)
     },
     loadBoards: function () {
         // retrieves boards and makes showBoards called
@@ -131,9 +131,8 @@ function addNewPBoard(){
     document.querySelector('#save_new_title').onclick = function() {
         let customTitle = document.querySelector('#new_title')
         createNewPBoard(customTitle.value);
-        dom.loadBoards();
         dataHandler.createNewBoard(customTitle.value)
-        .then()
+        .then(dom.loadBoards);
         modal.style.display = "none";
     }
 
