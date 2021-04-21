@@ -63,9 +63,23 @@ export let dataHandler = {
         });
     })
     },
-    boardNameChange: function (data){
+    updateBoardTitle: function (data){
         return new Promise ((resolve, reject) => {
-            this._api_post('/save-new-name', data,(response) => {
+            this._api_post('/update-board-title', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+    getCardTitle: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/get-card-title', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+    updateCardTitle: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/update-card-title', data,(response) => {
             resolve(response)
         });
     })

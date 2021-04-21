@@ -2,11 +2,35 @@
 import { dataHandler } from "./data_handler.js";
 
 export let dom = {
+    focusTarget: '',
+
     init: function () {
         let addNewPublicBoardBTN = document.querySelector("#add_public_board");
         addNewPublicBoardBTN.addEventListener('click', addNewPBoard);
         // This function should run once, when the page is loaded.
+        dom.initInputClose()
+        dom.initModalClose()
+    },
+    initModalClose: function (){
         document.querySelector('.close').addEventListener('click', this.closeModal)
+    },
+    initInputClose: function (){
+        document.addEventListener('click', this.closeInputFields);
+    },
+    setDefaultFocusTarget: function (){
+        dom.focusTarget = document.querySelector('.card');
+    },
+    closeInputFields: function (evt){
+        let inputField = dom.focusTarget.querySelector('input');
+        let isTargetArea = evt.composedPath().includes(dom.focusTarget);
+        let cardID = dom.focusTarget.dataset.cardId;
+        if (!isTargetArea){
+            inputField.closest('.card-title').childNodes[2].textContent = '';
+            inputField.classList.remove('display-flex-element');
+            inputField.classList.add('hide-element');
+            dataHandler.getCardTitle({'card_id': cardID})
+                .then((response) => inputField.after(response['title']))
+        }
     },
     loadBoards: function () {
         // retrieves boards and makes showBoards called
@@ -20,8 +44,10 @@ export let dom = {
             dom.showBoards(boards);
             dom.showDefaultStatuses(defaultStatuses);
             dom.showCards(cards);
-            dom.initCollapseBoard()
-            dom.initDragAndDrop()
+            dom.setDefaultFocusTarget();
+            dom.initCollapseBoard();
+            this.initCardEventListeners();
+            dom.initDragAndDrop();
         })
 
     },
@@ -55,7 +81,7 @@ export let dom = {
     saveBoardNameChange: function (evt){
         let newBoardName = document.querySelector('.modalInput').value;
         let boardID = document.querySelector('.modalInput').id;
-        dataHandler.boardNameChange({"board_name": newBoardName, "id": boardID})
+        dataHandler.updateBoardTitle({"board_name": newBoardName, "id": boardID})
             .then(() => document.querySelector(
                 `#board-id-${boardID} span`).innerHTML = newBoardName)
             .then(() => document.querySelector('.bg-modal').style.display = 'none')
@@ -95,9 +121,11 @@ export let dom = {
            let board = document.querySelector(`#board-id-${card.board_id}`)
            let column = board.querySelector(`#status-id-${card.status_id}`)
            column.insertAdjacentHTML('beforeend', `
-                <div id="card-id-${card['id']}" class="card" draggable="true">
+                <div id="card-id-${card['id']}" data-card-id="${card.id}" class="card" draggable="true">
                     <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
-                    <div class="card-title">${card.title}</div>
+                    <div class="card-title">
+                        <input value="${card.title}" class="card-title-change hide-element">${card.title}
+                    </div>
                 </div>
            `)
        }
@@ -150,8 +178,35 @@ export let dom = {
                     dom.insertElement(draggable, container, below, afterElement);
                 }
             })
-
        })
+    },
+
+    initCardEventListeners: function(){
+        let cards = document.querySelectorAll('.card');
+        let inputFields = document.querySelectorAll('.card-title-change');
+        for(let card of cards){
+            card.addEventListener('click', dom.showCardTitleInput)
+        }
+        for(let field of inputFields){
+            field.addEventListener('keydown', dom.initTitleChange)
+        }
+    },
+
+    showCardTitleInput: function (evt){
+        let titleDiv = evt.currentTarget.querySelector('.card-title');
+        titleDiv.childNodes[2].textContent = '';
+        titleDiv.childNodes[1].classList.remove('hide-element');
+        titleDiv.childNodes[1].classList.add('display-flex-element');
+        dom.focusTarget = titleDiv.closest('.card');
+    },
+
+    discardTitleChange: function (target){
+        let cardID = dom.focusTarget.dataset.cardId;
+        target.closest('.card-title').childNodes[2].textContent = '';
+        target.classList.remove('display-flex-element');
+        target.classList.add('hide-element');
+            dataHandler.getCardTitle({'card_id': cardID})
+                .then((response) => target.after(response['title']))
     },
 
     insertElement: (draggable, container, below, afterElement) => {
@@ -182,6 +237,24 @@ export let dom = {
         return allCardsInStatus.map((item) => {
             return item.getAttribute('id').match(/[0-9]+/)[0]
         })
+    },
+    saveTitleChange: function (evt, titleInput) {
+        let newTitle = evt.currentTarget.value;
+        let cardID = titleInput.closest("[data-card-id]").dataset.cardId;
+        titleInput.value = newTitle;
+        titleInput.after(newTitle) // put the new title after the hidden input field
+        dataHandler.updateCardTitle({'new_title': newTitle, 'card_id': cardID})
+            .then(() => titleInput.classList.add('hide-element'))
+            .then(() => titleInput.classList.remove('display-flex-element'))
+    },
+
+    initTitleChange: function (evt){
+        let titleInput = evt.currentTarget;
+        if(evt.key === 'Enter'){
+            dom.saveTitleChange(evt, titleInput);
+        } else if(evt.key === 'Escape'){
+            dom.discardTitleChange(titleInput)
+        }
     },
 };
 
@@ -217,10 +290,10 @@ function createModal(){
 }
 
 // Creates new public board with title adds after last board
-function createNewPBoard(customTitle){
-        let boards = document.querySelectorAll('section');
-        let lastBoard = document.querySelector('section:last-child');
-        lastBoard.insertAdjacentHTML('afterend', `
+function createNewPBoard(customTitle) {
+    let boards = document.querySelectorAll('section');
+    let lastBoard = document.querySelector('section:last-child');
+    lastBoard.insertAdjacentHTML('afterend', `
                 <section id="board-id-${boards.length + 1}" class="board" data-board-id="${boards.length + 1}">
                     <div class="board-header"><span class="board-title">${customTitle}</span>
                         <button class="board-add">Add Card</button>
@@ -229,4 +302,4 @@ function createNewPBoard(customTitle){
                     <div class="board-columns"></div>
                 </section>
             `);
-};
+}

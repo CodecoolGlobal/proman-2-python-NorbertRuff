@@ -14,12 +14,30 @@ def index():
     return render_template('index.html')
 
 
-@app.route("/save-new-name", methods=["POST"])
-def save_new_name():
+@json_response
+@app.route("/get-card-title", methods=["POST"])
+def get_card_title():
+    card_id = request.get_json()['card_id']
+    return data_handler.get_card_title(card_id)
+
+
+@app.route("/update-card-title", methods=["POST"])
+def update_card_title():
+    new_title = request.get_json()['new_title']
+    card_id = request.get_json()['card_id']
+    try:
+        data_handler.update_card_title(new_title, card_id)
+        return jsonify({"response": "OK"})
+    except:
+        return jsonify({"response": "There was an error during execution of your request"})
+
+
+@app.route("/update-board-title", methods=["POST"])
+def update_board_title():
     new_name = request.get_json()['board_name']
     board_id = request.get_json()['id']
     try:
-        data_handler.save_new_table_name(new_name, board_id)
+        data_handler.update_table_title(new_name, board_id)
         return jsonify({"response": "OK"})
     except:
         return jsonify({"response": "There was an error during execution of your request"})
