@@ -6,7 +6,7 @@ export let dom = {
         let addNewPublicBoardBTN = document.querySelector("#add_public_board");
         addNewPublicBoardBTN.addEventListener('click', addNewPBoard);
         // This function should run once, when the page is loaded.
-        document.querySelector('.close').addEventListener('click', this.closeModal)
+        // document.querySelector('.close').addEventListener('click', this.closeModal) ////// TODO does this do???
     },
     loadBoards: function () {
         // retrieves boards and makes showBoards called
@@ -102,6 +102,22 @@ export let dom = {
        }
     },
 
+       initCollapseBoard: () => {
+        let toggleButtons = document.querySelectorAll(".board-toggle");
+        for (let button of toggleButtons) {
+            button.firstChild.classList.remove('fa-chevron-down') // set default to up button
+            button.firstChild.classList.add('fa-chevron-up')      // set default to up button
+            button.addEventListener('click', dom.handleToggleButtonClick)
+        }
+    },
+
+    handleToggleButtonClick: (event) => {
+        let boardColumn = event.currentTarget.parentElement.parentElement.querySelector('.board-columns');
+        boardColumn.classList.toggle('hide-element');
+        event.currentTarget.firstChild.classList.toggle('fa-chevron-down')
+        event.currentTarget.firstChild.classList.toggle('fa-chevron-up')
+    }
+
 };
 
 // Main function for setting up, creating, saving new board
@@ -149,23 +165,4 @@ function createNewPBoard(customTitle){
                     <div class="board-columns"></div>
                 </section>
             `);
-}
-
-    initCollapseBoard: () => {
-        let toggleButtons = document.querySelectorAll(".board-toggle");
-        console.log(toggleButtons)
-        for (let button of toggleButtons) {
-            button.firstChild.classList.remove('fa-chevron-down') // set default to up button
-            button.firstChild.classList.add('fa-chevron-up')      // set default to up button
-            button.addEventListener('click', dom.handleToggleButtonClick)
-        }
-    },
-
-    handleToggleButtonClick: (event) => {
-        let boardColumn = event.currentTarget.parentElement.parentElement.querySelector('.board-columns');
-        boardColumn.classList.toggle('hide-element');
-        event.currentTarget.firstChild.classList.toggle('fa-chevron-down')
-        event.currentTarget.firstChild.classList.toggle('fa-chevron-up')
-    }
-
 };
