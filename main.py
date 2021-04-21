@@ -14,6 +14,13 @@ def index():
     return render_template('index.html')
 
 
+@json_response
+@app.route("/get-card-title", methods=["POST"])
+def get_card_title():
+    card_id = request.get_json()['card_id']
+    return data_handler.get_card_title(card_id)
+
+
 @app.route("/update-card-title", methods=["POST"])
 def update_card_title():
     new_title = request.get_json()['new_title']
