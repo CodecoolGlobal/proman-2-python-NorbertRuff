@@ -5,6 +5,7 @@ export let dom = {
     init: function () {
         document.querySelector('.close').addEventListener('click', this.closeModal)
     },
+
     loadBoards: function () {
         // retrieves boards and makes showBoards called
         let promise1 = dataHandler.getBoards()
@@ -17,9 +18,11 @@ export let dom = {
             dom.showBoards(boards);
             dom.showDefaultStatuses(defaultStatuses);
             dom.showCards(cards);
+            dom.initCollapseBoard()
         })
 
     },
+
     showBoards: function (boards) {
         let boardsContainer = document.querySelector('#boards');
         boardsContainer.innerHTML = ''
@@ -96,5 +99,22 @@ export let dom = {
            `)
        }
     },
+
+    initCollapseBoard: () => {
+        let toggleButtons = document.querySelectorAll(".board-toggle");
+        console.log(toggleButtons)
+        for (let button of toggleButtons) {
+            button.firstChild.classList.remove('fa-chevron-down') // set default to up button
+            button.firstChild.classList.add('fa-chevron-up')      // set default to up button
+            button.addEventListener('click', dom.handleToggleButtonClick)
+        }
+    },
+
+    handleToggleButtonClick: (event) => {
+        let boardColumn = event.currentTarget.parentElement.parentElement.querySelector('.board-columns');
+        boardColumn.classList.toggle('hide-element');
+        event.currentTarget.firstChild.classList.toggle('fa-chevron-down')
+        event.currentTarget.firstChild.classList.toggle('fa-chevron-up')
+    }
 
 };

@@ -194,3 +194,11 @@ section.board{
   border-color: #fec503;
   box-shadow: 0 0 0 0.2rem rgba(254, 216, 84, 0.5);
 }
+
+.display-flex-element {
+  display: flex;
+}
+
+.hide-element {
+  display: none;
+}
