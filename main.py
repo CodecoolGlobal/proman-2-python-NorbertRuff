@@ -15,6 +15,13 @@ def index():
 
 
 @json_response
+@app.route("/new-status", methods=["POST"])
+def add_new_status():
+    title = request.get_json()['title']
+    return data_handler.add_new_status(title)
+
+
+@json_response
 @app.route("/get-card-title", methods=["POST"])
 def get_card_title():
     card_id = request.get_json()['card_id']
