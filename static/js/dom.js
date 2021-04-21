@@ -27,14 +27,15 @@ export let dom = {
         for (let board of boards){
             boardsContainer.insertAdjacentHTML('beforeend', `
             <section id="board-id-${board['id']}" class="board" data-board-id="${board['id']}">
-                <div class="board-header"><span id="board${board.id}" class="board-title">${board['title']}</span>
+                <div class="board-header"><span data-board-title="${board.title}" class="board-title">${board['title']}</span>
                     <button class="board-add">Add Card</button>
                     <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
                 </div>
                 <div class="board-columns">Empty column</div>
             </section>
             ` );
-            document.querySelector(`#board${board.id}`).addEventListener('click', this.changeBoardName)
+            let section = document.querySelector(`#board-id-${board['id']}`);
+            section.querySelector(`[data-board-title="${board.title}"]`).addEventListener('click', this.changeBoardName)
         }
     },
     changeBoardName: function (evt){
@@ -49,20 +50,21 @@ export let dom = {
         let newBoardName = document.querySelector('.modalInput').value;
         let boardID = document.querySelector('.modalInput').id;
         dataHandler.boardNameChange({"board_name": newBoardName, "id": boardID})
-            .then(() => document.querySelector(`#board${boardID}`).innerHTML = newBoardName)
+            .then(() => document.querySelector(
+                `#board-id-${boardID} span`).innerHTML = newBoardName)
             .then(() => document.querySelector('.bg-modal').style.display = 'none')
     },
 
     modalBoardNameChange: function (evt){
         document.querySelector('.modal-content').innerHTML = '';
-        let parentSection = evt.target.parentNode.parentNode
-        let boardID = parentSection.getAttribute('data-board-id')
-        let boardName = evt.target.id;
+        let parentSection = evt.target.parentNode.parentNode;
+        let boardID = parentSection.getAttribute('data-board-id');
+        let boardName = evt.target.dataset.boardTitle;
         document.querySelector('.bg-modal').style.display = "block";
         document.querySelector('.modal-content').insertAdjacentHTML(
             'beforeend',
             `<h2>Change board name</h2>
-                  <input id="${boardID}" class="modalInput" placeholder="${boardName}">`)
+                  <input id="${boardID}" class="modalInput" value="${boardName}">`)
         document.querySelector('#saveChanges').addEventListener('click', this.saveBoardNameChange)
 
     },
