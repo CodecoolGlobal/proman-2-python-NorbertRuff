@@ -21,6 +21,7 @@ export let dom = {
             dom.showDefaultStatuses(defaultStatuses);
             dom.showCards(cards);
             dom.initCollapseBoard()
+            dom.initDragAndDrop()
         })
 
     },
@@ -94,7 +95,7 @@ export let dom = {
            let board = document.querySelector(`#board-id-${card.board_id}`)
            let column = board.querySelector(`#status-id-${card.status_id}`)
            column.insertAdjacentHTML('beforeend', `
-                <div class="card">
+                <div id="card-id-${card['id']}" class="card" draggable="true">
                     <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
                     <div class="card-title">${card.title}</div>
                 </div>
@@ -116,8 +117,72 @@ export let dom = {
         boardColumn.classList.toggle('hide-element');
         event.currentTarget.firstChild.classList.toggle('fa-chevron-down')
         event.currentTarget.firstChild.classList.toggle('fa-chevron-up')
-    }
+    },
 
+    initDragAndDrop: () => {
+        const draggables = document.querySelectorAll(".card")
+        const containers = document.querySelectorAll(".board-column-content")
+
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', () => {
+            draggable.classList.add('dragging');
+            })
+            draggable.addEventListener('dragend', () => {
+            draggable.classList.remove('dragging');
+            let cardID = draggable.getAttribute('id').match(/[0-9]+/)[0]
+            let statusID =  draggable.parentNode.getAttribute('id').match(/[0-9]+/)[0]
+            let boardID = draggable.closest('.board').getAttribute('id').match(/[0-9]+/)[0]
+            let allCardsInStatus = dom.getAllCardsIDFromStatus(draggable)
+            dataHandler.updateCards({'card_id': cardID, 'status_id': statusID, 'board_id': boardID, 'cards_order': allCardsInStatus})
+            })
+        })
+        containers.forEach(container => {
+            container.addEventListener('dragover', (event) => {
+            event.preventDefault();
+                const afterElement = dom.getDragAfterElement(container, event.clientY);
+                const draggable = document.querySelector('.dragging');
+                if (afterElement === undefined) {
+                    let below = true;
+                    dom.insertElement(draggable, container, below, afterElement);
+                }
+                else {
+                    let below = false;
+                    dom.insertElement(draggable, container, below, afterElement);
+                }
+            })
+
+       })
+    },
+
+    insertElement: (draggable, container, below, afterElement) => {
+            if (below) {
+                container.appendChild(draggable);
+            }
+            else {
+                container.insertBefore(draggable, afterElement)
+            }
+    },
+
+    getDragAfterElement: (container, y) => {
+    const draggableElements = [...container.querySelectorAll('.card:not(.dragging)')];
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+            return {offset: offset, element: child};
+        }
+        else {
+            return closest;
+        }
+    }, {offset: Number.NEGATIVE_INFINITY}).element;
+    },
+
+    getAllCardsIDFromStatus: (draggable) => {
+        let allCardsInStatus = [...draggable.parentNode.children]
+        return allCardsInStatus.map((item) => {
+            return item.getAttribute('id').match(/[0-9]+/)[0]
+        })
+    },
 };
 
 // Main function for setting up, creating, saving new board

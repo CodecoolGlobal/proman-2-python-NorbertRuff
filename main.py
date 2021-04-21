@@ -58,6 +58,20 @@ def save_new_board():
     data_handler.save_new_board(json_data)
 
 
+@app.route("/update-cards", methods=["POST"])
+def update_cards():
+    card_id = request.get_json()['card_id']
+    status_id = request.get_json()['status_id']
+    board_id = request.get_json()['board_id']
+    cards_order = request.get_json()['cards_order']
+    try:
+        data_handler.update_card_data(card_id, board_id, status_id)
+        data_handler.update_cards_order(cards_order)
+        return jsonify({"response": "OK"})
+    except:
+        return jsonify({"response": "There was an error during execution of your request"})
+
+
 def main():
     app.run(debug=True)
 
