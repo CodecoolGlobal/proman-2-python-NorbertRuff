@@ -1,9 +1,9 @@
 :root{
     --border-radius: 3px;
-    --status-1: #590000;
-    --status-2: #594300;
-    --status-3: #525900;
-    --status-4: #085900;
+    --status-1: #a72727;
+    --status-2: #8b6c0b;
+    --status-3: #929c07;
+    --status-4: #209213;
 }
 
 body{
@@ -201,4 +201,8 @@ section.board{
 
 .hide-element {
   display: none;
+}
+
+.dragging {
+    opacity: .5;
 }
