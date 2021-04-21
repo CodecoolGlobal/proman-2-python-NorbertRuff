@@ -36,6 +36,18 @@ def get_card_title(cursor, card_id):
 
 
 @connection.connection_handler
+def add_new_status(cursor, title):
+    """Add new status and return it"""
+    query = """
+        INSERT INTO statuses (title)VALUES (%(title)s)
+        RETURNING id,title
+        """
+    var = {"title": title}
+    cursor.execute(query, var)
+    return cursor.fetchone()
+
+
+@connection.connection_handler
 def update_card_title(cursor, new_name, id):
     query = """
         UPDATE cards 
