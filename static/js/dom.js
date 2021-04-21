@@ -10,8 +10,7 @@ export let dom = {
         dom.initModalClose();
     },
 
-    initNewPublicBoardButton: function (){
-        document.querySelector("h1").insertAdjacentHTML('afterend',`<br><button id="add_public_board" class="board-add">Add new public board</button><br>`)
+    initNewPublicBoardButton: function () {
         let addNewPublicBoardBTN = document.querySelector("#add_public_board");
         addNewPublicBoardBTN.addEventListener('click', dom.initNewBoardCreate);
     },
@@ -98,9 +97,11 @@ export let dom = {
         for (let board of boards){
             boardsContainer.insertAdjacentHTML('beforeend', `
             <section id="board-id-${board['id']}" class="board" data-board-id="${board['id']}">
-                <div class="board-header"><span data-board-title="${board.title}" class="board-title">${board['title']}</span>
+                <div class="board-header">
+                    <span data-board-title="${board.title}" class="board-title">${board['title']}</span>
+                    <span class="flex-grow-max"></span>
                     <button data-button-functionality="card" class="card-add">Add Card</button>
-                    <button data-button-functionality="column" class="board-add">Add new column</button>
+                    <button data-button-functionality="column" class="board-add">Add Column</button>
                     <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
                 </div>
                 <div class="board-columns">Empty column</div>
@@ -162,14 +163,13 @@ export let dom = {
        for (let card of cards) {
            let board = document.querySelector(`#board-id-${card.board_id}`)
            let column = board.querySelector(`#status-id-${card.status_id}`)
-           column.insertAdjacentHTML('beforeend', `
-                <div id="card-id-${card['id']}" data-card-id="${card.id}" class="card" draggable="true">
+           column.insertAdjacentHTML('beforeend',
+               `<div id="card-id-${card['id']}" data-card-id="${card.id}" class="card" draggable="true">
                     <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
                     <div class="card-title">
                         <input value="${card.title}" class="card-title-change hide-element">${card.title}
                     </div>
-                </div>
-           `)
+                </div>`)
        }
     },
 
@@ -189,6 +189,8 @@ export let dom = {
         event.currentTarget.firstChild.classList.toggle('fa-chevron-up')
         let addCol = event.currentTarget.closest('.board-header').querySelector('[data-button-functionality="column"]');
         addCol.classList.toggle('hide-element')
+        let addCard = event.currentTarget.closest('.board-header').querySelector('[data-button-functionality="card"]');
+        addCard.classList.toggle('hide-element')
     },
 
     initDragAndDrop: () => {
@@ -197,15 +199,15 @@ export let dom = {
 
         draggables.forEach(draggable => {
             draggable.addEventListener('dragstart', () => {
-            draggable.classList.add('dragging');
+                draggable.classList.add('dragging');
             })
             draggable.addEventListener('dragend', () => {
-            draggable.classList.remove('dragging');
-            let cardID = draggable.getAttribute('id').match(/[0-9]+/)[0]
-            let statusID =  draggable.parentNode.getAttribute('id').match(/[0-9]+/)[0]
-            let boardID = draggable.closest('.board').getAttribute('id').match(/[0-9]+/)[0]
-            let allCardsInStatus = dom.getAllCardsIDFromStatus(draggable)
-            dataHandler.updateCards({'card_id': cardID, 'status_id': statusID, 'board_id': boardID, 'cards_order': allCardsInStatus})
+                draggable.classList.remove('dragging');
+                let cardID = draggable.getAttribute('id').match(/[0-9]+/)[0]
+                let statusID =  draggable.parentNode.getAttribute('id').match(/[0-9]+/)[0]
+                let boardID = draggable.closest('.board').getAttribute('id').match(/[0-9]+/)[0]
+                let allCardsInStatus = dom.getAllCardsIDFromStatus(draggable)
+                dataHandler.updateCards({'card_id': cardID, 'status_id': statusID, 'board_id': boardID, 'cards_order': allCardsInStatus})
             })
         })
         containers.forEach(container => {

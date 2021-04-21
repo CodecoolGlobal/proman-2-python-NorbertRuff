@@ -17,18 +17,24 @@
 
 
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/design.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/header.css') }}">
+
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
+
         <script type="module" src="{{ url_for('static', filename='js/main.js') }}" defer></script>
     </head>
     <body>
-        <h1>ProMan</h1>
+        {% include '--header.html' %}
+        <h3>Boards</h3>
         <div id="boards">Boards are loading...</div>
         <div class="bg-modal">
             <div class="modal">
                 <i id="close" class="fas fa-times close"></i>
                 <div class="modal-content">
+                    </div>
+                        <div class="modal-footer"><button type="button" id="saveChanges" class="btn btn-primary">Save</button></div>
+                    </div>
                 </div>
-                    <div class="modal-footer"><button type="button" id="saveChanges" class="btn btn-primary">Save</button></div>
-                </div>
-            </div>
     </body>
 </html>

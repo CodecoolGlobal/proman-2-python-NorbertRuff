@@ -1,44 +1,57 @@
 :root{
     --border-radius: 3px;
-    --status-1: #a72727;
-    --status-2: #8b6c0b;
-    --status-3: #929c07;
-    --status-4: #209213;
+    --status-1: rgba(167, 39, 39, 0.8);
+    --status-2: rgba(139, 81, 11, 0.8);
+    --status-3: rgba(146, 156, 7, 0.8);
+    --status-4: rgba(32, 146, 19, 0.8);
 }
 
-body{
+html {
+    overflow-y: scroll;
+}
+
+html, body, button, input {
+    font-family: 'Rubik', sans-serif;
+}
+
+body {
     min-width: 620px;
     background: #ddd url(http://cdn.backgroundhost.com/backgrounds/subtlepatterns/diagonal-noise.png);
-    font-family: sans-serif;
+
 }
+
 
 h1, .board-title, .board-column-title{
     font-weight: 100;
 }
 
-h1{
+h3 {
     text-align: center;
-    font-size: 4em;
+    font-size: 2em;
     letter-spacing: 5px;
-    transform: scale(1.2, 1);
+    /*transform: scale(1.2, 1);*/
 }
 
 button{
-    background: #222;
+    background: rgba(0, 82, 204, 0.5);
     color: #fff;
     border: none;
-    font-size: 14px;
+    font-size: 12px;
     font-family: sans-serif;
-    padding: 4px 10px;
+    padding: 8px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    height: 28px;
+    margin: 10px 2px 10px 2px;
 }
 
 .board-container{
-    max-width: 960px;
+    max-width: 1024px;
     margin: 0 auto;
 }
 
 section.board{
-    margin: 20px;
+    margin: 25px;
     border: aliceblue;
     background: #ffffff90;
     border-radius: 3px;
@@ -48,6 +61,13 @@ section.board{
     height: 50px;
     background: #fff;
     border-radius: var(--border-radius) var(--border-radius) 0 0;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.flex-grow-max {
+    flex-grow: 1;
 }
 
 .board-title{
@@ -55,13 +75,15 @@ section.board{
     display: inline-block;
     font-size: 20px;
 }
-.board-title, .board-add, .board-toggle{
+.board-title {
     display: inline-block;
 }
 
+
 .board-toggle{
-    float: right;
-    margin: 13px;
+    margin: 10px 2px 10px 2px;
+    background: rgba(0, 82, 204, 0.1);
+    color: rgba(0, 82, 204, 0.6);
 }
 
 .board-columns{
@@ -75,19 +97,20 @@ section.board{
 }
 
 .board-column-content{
-    min-height: 49px;
+    min-height: 45px;
 }
 
 .board-column-content:empty{
     /*This only works if the tag is really empty and there is not even whitespace inside*/
-    border: 4px solid #cdcdcd;
+    border: 4px solid rgba(205, 205, 205, 0.5);
     margin-top: 4px;
-    border-radius: 10px;
-    background: #eee;
+    border-radius: var(--border-radius);
 }
 
 .board-column-title{
     text-align: center;
+    text-transform: uppercase;
+    margin: 6px 0 10px 0;
 }
 
 .card{
@@ -96,7 +119,7 @@ section.board{
     color: #fff;
     border-radius: var(--border-radius);
     margin: 4px 0;
-    padding: 4px;
+    padding: 10px;
 }
 
 .board-column:nth-of-type(1) .card{
@@ -118,14 +141,22 @@ section.board{
 .card-remove{
     display: block;
     position: absolute;
-    top: 4px;
-    right: 4px;
-    font-size: 12px;
+    top: 6px;
+    right: 6px;
+    font-size: 10px;
     cursor: pointer;
 }
 
 .card-title{
-    padding-right: 16px;
+    padding: 2px 16px 2px 2px;
+    border-width: 2px;
+}
+
+.card-title>input {
+    width:100%;
+    box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    padding: 2px;
 }
 /*--------------------------modal-----------------------------*/
 .bg-modal {
@@ -147,16 +178,21 @@ section.board{
     justify-content: center;
     margin: 15% auto;
     padding: 20px;
-    width: 60%;
+    width: 25vw;
     border: black;
-    background-color: aliceblue;
+    border-radius: 4px;
+    background-color: rgba(245, 247, 255, 1);
+}
+
+.modalInput {
+    padding: 4px;
 }
 /*--------------------------modal-----------------------------*/
 
 .close {
   color: #aaa;
   float: right;
-  font-size: 45px;
+  font-size: 20px;
   font-weight: bold;
     padding-right: 10px;
 }
@@ -168,17 +204,17 @@ section.board{
 }
 .btn-primary {
   color: #fff;
-  background-color: #3679fe;
+  background: rgba(0, 82, 204, 0.5);
   border-color: #fed136;
 }
 .btn-primary:hover {
   color: #fff;
-  background-color: #fec810;
+  background: rgba(0, 82, 204, 0.8);
   border-color: #fec503;
 }
 .btn-primary:focus, .btn-primary.focus {
   color: #fff;
-  background-color: #fec810;
+  background: rgba(0, 82, 204, 0.8);
   border-color: #fec503;
   box-shadow: 0 0 0 0.2rem rgba(254, 216, 84, 0.5);
 }
@@ -189,6 +225,14 @@ section.board{
 
 .hide-element {
   display: none;
+}
+
+.visibility-hidden {
+  visibility: hidden;
+}
+
+.visibility-visible {
+  visibility: visible;
 }
 
 .dragging {
