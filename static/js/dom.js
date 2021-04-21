@@ -305,21 +305,18 @@ export let dom = {
         },
          createNewCard: function(evt) {
             let cardContainers = evt.currentTarget.parentElement
+            let cardContainer = cardContainers.nextSibling.nextSibling;
             let boardId = evt.currentTarget.parentElement.parentElement.dataset.boardId
-            let cardID = evt.currentTarget
-            let statusID =  evt.currentTarget
-            let boardID = evt.currentTarget.closest('.board').getAttribute('id')
-            console.log(boardID)
-            console.log(statusID)
-            console.log(cardID)
+            let lastCard = cardContainer.querySelectorAll(".board-column-content .card");
+            let cardOrder = lastCard.length+1;
+            let statusId =  0;
             dom.showModal()
             dom.createModal("Card")
             document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title')
                 dom.addNewCardToBoard(customTitle.value, cardContainers);
                 dom.closeModal()
-                // dataHandler.createNewCard(boardId, customTitle.value, statusId, cardOrder) //TODO
-                // .then(dom.loadBoards);
+                dataHandler.createNewCard(boardId, customTitle.value, statusId, cardOrder).then(dom.loadBoards)
             }
          },
          addNewCardToBoard: function(customTitle, cardContainers) {

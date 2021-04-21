@@ -70,6 +70,15 @@ def save_new_board(cursor, json_data):
     cursor.execute(query, var)
 
 
+@connection.connection_handler
+def save_new_card(cursor, board_id, title, status_id, cards_order, archived):
+    query = """
+            INSERT INTO cards values (DEFAULT, %(data1)s, %(data2)s, %(data3)s, %(data4)s, %(data5)s);
+            """
+    var = {'data1': board_id, 'data2': title, 'data3': status_id, 'data4': cards_order, 'data5': archived}
+    cursor.execute(query, var)
+
+
 
 @connection.connection_handler
 def get_default_statuses(cursor):
