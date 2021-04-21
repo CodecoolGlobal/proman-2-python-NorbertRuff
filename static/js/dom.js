@@ -80,9 +80,12 @@ function addNewPBoard(){
     document.querySelector('#save_new_title').onclick = function() {
         let customTitle = document.querySelector('#new_title')
         createNewPBoard(customTitle.value);
+        dom.loadBoards();
+        dataHandler.createNewBoard(customTitle.value)
+        .then()
         modal.style.display = "none";
     }
-    saveNewBoardToDB()
+
 }
 
 // Creates modal element
@@ -111,10 +114,5 @@ function createNewPBoard(customTitle){
                     <div class="board-columns"></div>
                 </section>
             `);
-}
-
-// Saves new board to DB
-function saveNewBoardToDB(){
-
 }
 

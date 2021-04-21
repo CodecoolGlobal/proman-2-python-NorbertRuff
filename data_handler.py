@@ -27,6 +27,16 @@ def get_boards(cursor, username):
 
 
 @connection.connection_handler
+def save_new_board(cursor, json_data):
+    query = """
+            INSERT INTO boards values (DEFAULT, %(data)s, NULL);
+            """
+    var = {'data': json_data}
+    cursor.execute(query, var)
+
+
+
+@connection.connection_handler
 def get_default_statuses(cursor):
     query = """
     SELECT id, title 

@@ -1,5 +1,6 @@
-from flask import Flask, render_template, url_for, session
+from flask import Flask, render_template, url_for, session, request
 from util import json_response
+
 
 import data_handler
 
@@ -38,6 +39,13 @@ def get_default_statuses():
 def get_all_cards():
     username = session.get('username', 'test@password.com')
     return data_handler.get_all_cards(username)
+
+
+@app.route("/create-board", methods=['POST'])
+@json_response
+def save_new_board():
+    json_data = request.get_json()
+    data_handler.save_new_board(json_data)
 
 
 def main():
