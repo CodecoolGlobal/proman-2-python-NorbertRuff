@@ -60,7 +60,8 @@ export let dom = {
             boardsContainer.insertAdjacentHTML('beforeend', `
             <section id="board-id-${board['id']}" class="board" data-board-id="${board['id']}">
                 <div class="board-header"><span data-board-title="${board.title}" class="board-title">${board['title']}</span>
-                    <button class="board-add">Add Card</button>
+                    <button data-button-functionality="card" class="board-add">Add Card</button>
+                    <button data-button-functionality="column" class="board-add">Add new column</button>
                     <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
                 </div>
                 <div class="board-columns">Empty column</div>
@@ -147,7 +148,13 @@ export let dom = {
         boardColumn.classList.toggle('hide-element');
         event.currentTarget.firstChild.classList.toggle('fa-chevron-down')
         event.currentTarget.firstChild.classList.toggle('fa-chevron-up')
+        let addCol = event.currentTarget.closest('.board-header').querySelector('[data-button-functionality="column"]');
+        addCol.classList.toggle('hide-element')
     },
+
+    // isCollapsedBoard:function (evt){
+    //     return evt.querySelector('i').classList.contains('fa-chevron-down')
+    // },
 
     initDragAndDrop: () => {
         const draggables = document.querySelectorAll(".card")
