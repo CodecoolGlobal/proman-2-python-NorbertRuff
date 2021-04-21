@@ -90,6 +90,13 @@ export let dataHandler = {
         });
     },
 
+    newStatus: function (data) {
+        return new Promise ((resolve, reject) => {
+            this._api_post('/new-status', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
 
     getStatus: function (statusId, callback) {
         // the status is retrieved and then the callback function is called with the status

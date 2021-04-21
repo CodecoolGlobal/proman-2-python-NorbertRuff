@@ -5,33 +5,70 @@ export let dom = {
     focusTarget: '',
     // This function should run once, when the page is loaded.
     init: function () {
+        dom.initNewPublicBoardButton();
+        dom.initInputClose();
+        dom.initModalClose();
+    },
+
+    initNewPublicBoardButton: function (){
         document.querySelector("h1").insertAdjacentHTML('afterend',`<br><button id="add_public_board" class="board-add">Add new public board</button><br>`)
         let addNewPublicBoardBTN = document.querySelector("#add_public_board");
         addNewPublicBoardBTN.addEventListener('click', dom.initNewBoardCreate);
-        dom.initInputClose()
-        dom.initModalClose()
     },
+
     initModalClose: function (){
         document.querySelector('.close').addEventListener('click', this.closeModal)
     },
+
     initInputClose: function (){
-        document.addEventListener('click', this.closeInputFields);
+        window.addEventListener('click', this.closeInputFields);
     },
+
     setDefaultFocusTarget: function (){
         dom.focusTarget = document.querySelector('.card');
     },
+
     closeInputFields: function (evt){
         let inputField = dom.focusTarget.querySelector('input');
-        let isTargetArea = evt.composedPath().includes(dom.focusTarget);
-        let cardID = dom.focusTarget.dataset.cardId;
-        if (!isTargetArea){
-            inputField.closest('.card-title').childNodes[2].textContent = '';
-            inputField.classList.remove('display-flex-element');
-            inputField.classList.add('hide-element');
-            dataHandler.getCardTitle({'card_id': cardID})
-                .then((response) => inputField.after(response['title']))
+        if(!inputField.classList.contains('hide-element')){
+            let isTargetArea = evt.composedPath().includes(dom.focusTarget);
+            let cardID = dom.focusTarget.dataset.cardId;
+            if (!isTargetArea){
+                inputField.closest('.card-title').childNodes[2].textContent = '';
+                inputField.classList.remove('display-flex-element');
+                inputField.classList.add('hide-element');
+                dataHandler.getCardTitle({'card_id': cardID})
+                    .then((response) => inputField.after(response['title']))
+            }
         }
     },
+    initAddNewColumnListeners: function (){
+            let addNewColButtons = document.querySelectorAll('[data-button-functionality="column"]');
+            for (let button of addNewColButtons){
+                button.addEventListener('click', dom.addNewColumn)
+            }
+        },
+
+    addNewColumn: function (evt){
+        evt.stopImmediatePropagation();
+        evt.preventDefault();
+        dom.showModal();
+        dom.createModal('column')
+        let columnArea = evt.currentTarget.closest('section').querySelector(".board-columns");
+        document.querySelector('#saveChanges').onclick = function() {
+            let customTitle = document.querySelector('#new_title');
+            dataHandler.newStatus({"title": customTitle.value})
+                .then((response) =>
+                    columnArea.insertAdjacentHTML(
+                        'beforeend', `
+                <div class="board-column">
+                <div class="board-column-title">${response.title}</div>
+                <div id="status-id-${response.id}" class="board-column-content" data-status-id="${response.id}"></div>
+                </div>`))
+            dom.closeModal()
+        }
+    },
+
     loadBoards: function () {
         // retrieves boards and makes showBoards called
         let promise1 = dataHandler.getBoards()
@@ -46,6 +83,7 @@ export let dom = {
             dom.showCards(cards);
             dom.setDefaultFocusTarget();
             dom.initCollapseBoard();
+            dom.initAddNewColumnListeners()
             dom.initCardEventListeners();
             dom.initDragAndDrop();
         })
@@ -151,10 +189,6 @@ export let dom = {
         let addCol = event.currentTarget.closest('.board-header').querySelector('[data-button-functionality="column"]');
         addCol.classList.toggle('hide-element')
     },
-
-    // isCollapsedBoard:function (evt){
-    //     return evt.querySelector('i').classList.contains('fa-chevron-down')
-    // },
 
     initDragAndDrop: () => {
         const draggables = document.querySelectorAll(".card")
