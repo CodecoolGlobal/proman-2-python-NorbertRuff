@@ -3,11 +3,11 @@ import { dataHandler } from "./data_handler.js";
 
 export let dom = {
     focusTarget: '',
-
+    // This function should run once, when the page is loaded.
     init: function () {
+        document.querySelector("h1").insertAdjacentHTML('afterend',`<br><button id="add_public_board" class="board-add">Add new public board</button><br>`)
         let addNewPublicBoardBTN = document.querySelector("#add_public_board");
-        addNewPublicBoardBTN.addEventListener('click', addNewPBoard);
-        // This function should run once, when the page is loaded.
+        addNewPublicBoardBTN.addEventListener('click', dom.initNewBoardCreate);
         dom.initInputClose()
         dom.initModalClose()
     },
@@ -46,7 +46,7 @@ export let dom = {
             dom.showCards(cards);
             dom.setDefaultFocusTarget();
             dom.initCollapseBoard();
-            this.initCardEventListeners();
+            dom.initCardEventListeners();
             dom.initDragAndDrop();
         })
 
@@ -77,7 +77,9 @@ export let dom = {
     closeModal: function (){
         document.querySelector('.bg-modal').style.display = "none";
     },
-
+    showModal: function() {
+        document.querySelector(".bg-modal").style.display = "block";
+    },
     saveBoardNameChange: function (evt){
         let newBoardName = document.querySelector('.modalInput').value;
         let boardID = document.querySelector('.modalInput').id;
@@ -256,50 +258,43 @@ export let dom = {
             dom.discardTitleChange(titleInput)
         }
     },
+
+    // Main function for setting up, creating, saving new board
+     initNewBoardCreate: function(){
+        dom.showModal()
+        dom.createModal("Board")
+        document.querySelector('#saveChanges').onclick = function() {
+            let customTitle = document.querySelector('#new_title')
+            dom.createNewPBoard(customTitle.value);
+            dataHandler.createNewBoard(customTitle.value)
+            .then(dom.loadBoards);
+            dom.closeModal()
+            }
+        },
+
+        // Creates modal element
+         createModal: function(title){
+            let modalContent = document.querySelector('.modal-content')
+            modalContent.innerHTML = '';
+            modalContent.insertAdjacentHTML('beforeend', `
+                  <h2>Create new ${title}</h2>
+                  <input id="new_title" class="modalInput">
+            `);
+        },
+
+        // Creates new public board with title adds after last board
+         createNewPBoard: function(customTitle) {
+            let boards = document.querySelectorAll('section');
+            let lastBoard = document.querySelector('section:last-child');
+            lastBoard.insertAdjacentHTML('afterend', `
+                        <section id="board-id-${boards.length + 1}" class="board" data-board-id="${boards.length + 1}">
+                            <div class="board-header"><span class="board-title">${customTitle}</span>
+                                <button class="board-add">Add Card</button>
+                                <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
+                            </div>
+                            <div class="board-columns"></div>
+                        </section>
+                    `);
+        }
 };
 
-// Main function for setting up, creating, saving new board
-function addNewPBoard(){
-    const modal = document.querySelector(".bg-modal");
-    const closeSpan = document.querySelector(".close");
-    createModal()
-    modal.style.display = "block";
-    closeSpan.onclick = function() {modal.style.display = "none";}
-    window.onclick = function(event) {if (event.target == modal) modal.style.display = "none";}
-    document.querySelector('#save_new_title').onclick = function() {
-        let customTitle = document.querySelector('#new_title')
-        createNewPBoard(customTitle.value);
-        dataHandler.createNewBoard(customTitle.value)
-        .then(dom.loadBoards);
-        modal.style.display = "none";
-    }
-
-}
-
-// Creates modal element
-function createModal(){
-    let modalContent = document.querySelector('.modal-content')
-    modalContent.innerHTML = '';
-    modalContent.insertAdjacentHTML('afterbegin', ` 
-            <label for="new_title">Add title for new board</label>
-            <br><br>
-            <input type="text" name="new_title" id="new_title">
-            <br><br>
-    `);
-    document.querySelector('.modal-footer').innerHTML='<button id="save_new_title">Save</button>';
-}
-
-// Creates new public board with title adds after last board
-function createNewPBoard(customTitle) {
-    let boards = document.querySelectorAll('section');
-    let lastBoard = document.querySelector('section:last-child');
-    lastBoard.insertAdjacentHTML('afterend', `
-                <section id="board-id-${boards.length + 1}" class="board" data-board-id="${boards.length + 1}">
-                    <div class="board-header"><span class="board-title">${customTitle}</span>
-                        <button class="board-add">Add Card</button>
-                        <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
-                    </div>
-                    <div class="board-columns"></div>
-                </section>
-            `);
-}
