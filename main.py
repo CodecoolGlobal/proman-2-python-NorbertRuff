@@ -83,6 +83,19 @@ def save_new_board():
     data_handler.save_new_board(json_data)
 
 
+@app.route("/create-card", methods=['POST'])
+@json_response
+def create_card():
+    board_id = request.get_json()['boardId']
+    title = request.get_json()['title']
+    status_id = request.get_json()['statusId']
+    cards_order = request.get_json()['cardOrder']
+    archived = request.get_json()['archived']
+    data_handler.save_new_card(board_id, title, status_id, cards_order, archived)
+    return ""
+
+
+
 @app.route("/update-cards", methods=["POST"])
 def update_cards():
     card_id = request.get_json()['card_id']

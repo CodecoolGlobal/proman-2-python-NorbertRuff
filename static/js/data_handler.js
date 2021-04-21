@@ -109,14 +109,16 @@ export let dataHandler = {
     },
     createNewBoard: function (boardTitle) {
         // creates new board, saves it and calls the callback function with its data
-        return new Promise ((resolve, reject) => {
-            this._api_post('/create-board', boardTitle,(response) => {
-            resolve(response)
-        });
-        })
+
     },
-    createNewCard: function (cardTitle, boardId, statusId, callback) {
+    createNewCard: function (boardId, title, statusId, cardOrder, callback) { // TODO
         // creates new card, saves it and calls the callback function with its data
+        let data = {'boardId': boardId, 'title': title, 'statusId': statusId, 'cardOrder': cardOrder, 'archived': 'False'}
+        return new Promise ((resolve, reject) => {
+        this._api_post('/create-card', data,(response) => {
+             resolve(response)
+        });
+        });
     }
     // here comes more features
 };
