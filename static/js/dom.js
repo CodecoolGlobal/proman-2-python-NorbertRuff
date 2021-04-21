@@ -147,14 +147,14 @@ export let dom = {
         let cards = document.querySelectorAll('.card');
         let inputFields = document.querySelectorAll('.card-title-change');
         for(let card of cards){
-            card.addEventListener('click', dom.cardTitleChange)
+            card.addEventListener('click', dom.showCardTitleInput)
         }
         for(let field of inputFields){
-            field.addEventListener('keydown', dom.saveTitleChange)
+            field.addEventListener('keydown', dom.initTitleChange)
         }
     },
 
-    cardTitleChange: function (evt){
+    showCardTitleInput: function (evt){
         let titleDiv = evt.currentTarget.querySelector('.card-title');
         titleDiv.childNodes[2].textContent = '';
         titleDiv.childNodes[1].classList.remove('hide-element');
@@ -162,18 +162,31 @@ export let dom = {
         dom.focusTarget = titleDiv.closest('.card');
     },
 
-    saveTitleChange: function (evt){
-        let titleInput = evt.currentTarget;
-        let newTitle;
-        let cardID = titleInput.closest("[data-card-id]").dataset.cardId;
-        if(evt.key === 'Enter'){ // user pressed enter to save change
-            newTitle = evt.currentTarget.value;
-            titleInput.value = newTitle;
-            titleInput.after(newTitle) // put the new title after the hidden input field
-            dataHandler.updateCardTitle({'new_title': newTitle, 'card_id': cardID})
-                .then(()=> titleInput.classList.add('hide-element'))
-                .then(() => titleInput.classList.remove('display-flex-element'))
-        }
+    discardTitleChange: function (target){
+        let cardID = dom.focusTarget.dataset.cardId;
+        target.closest('.card-title').childNodes[2].textContent = '';
+        target.classList.remove('display-flex-element');
+        target.classList.add('hide-element');
+            dataHandler.getCardTitle({'card_id': cardID})
+                .then((response) => target.after(response['title']))
     },
 
+    saveTitleChange: function (evt, titleInput) {
+        let newTitle = evt.currentTarget.value;
+        let cardID = titleInput.closest("[data-card-id]").dataset.cardId;
+        titleInput.value = newTitle;
+        titleInput.after(newTitle) // put the new title after the hidden input field
+        dataHandler.updateCardTitle({'new_title': newTitle, 'card_id': cardID})
+            .then(() => titleInput.classList.add('hide-element'))
+            .then(() => titleInput.classList.remove('display-flex-element'))
+    },
+
+    initTitleChange: function (evt){
+        let titleInput = evt.currentTarget;
+        if(evt.key === 'Enter'){
+            dom.saveTitleChange(evt, titleInput);
+        } else if(evt.key === 'Escape'){
+            dom.discardTitleChange(titleInput)
+        }
+    },
 };
