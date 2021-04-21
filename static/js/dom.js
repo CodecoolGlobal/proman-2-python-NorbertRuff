@@ -48,6 +48,7 @@ export let dom = {
             dom.initCollapseBoard();
             dom.initCardEventListeners();
             dom.initDragAndDrop();
+            dom.setupAddNewCardsBTN()
         })
 
     },
@@ -60,7 +61,7 @@ export let dom = {
             boardsContainer.insertAdjacentHTML('beforeend', `
             <section id="board-id-${board['id']}" class="board" data-board-id="${board['id']}">
                 <div class="board-header"><span data-board-title="${board.title}" class="board-title">${board['title']}</span>
-                    <button class="board-add">Add Card</button>
+                    <button class="card-add">Add Card</button>
                     <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
                 </div>
                 <div class="board-columns">Empty column</div>
@@ -289,12 +290,46 @@ export let dom = {
             lastBoard.insertAdjacentHTML('afterend', `
                         <section id="board-id-${boards.length + 1}" class="board" data-board-id="${boards.length + 1}">
                             <div class="board-header"><span class="board-title">${customTitle}</span>
-                                <button class="board-add">Add Card</button>
+                                <button class="card-add">Add Card</button>
                                 <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
                             </div>
                             <div class="board-columns"></div>
                         </section>
                     `);
+        },
+        setupAddNewCardsBTN: function(){
+            let addCardButtons = document.getElementsByClassName("card-add");
+            for (let addCardButton of addCardButtons) {
+                addCardButton.addEventListener('click', dom.createNewCard)
+                }
+        },
+         createNewCard: function(evt) {
+            let cardContainers = evt.currentTarget.parentElement
+            let boardId = evt.currentTarget.parentElement.parentElement.dataset.boardId
+            let cardID = evt.currentTarget
+            let statusID =  evt.currentTarget
+            let boardID = evt.currentTarget.closest('.board').getAttribute('id')
+            console.log(boardID)
+            console.log(statusID)
+            console.log(cardID)
+            dom.showModal()
+            dom.createModal("Card")
+            document.querySelector('#saveChanges').onclick = function() {
+            let customTitle = document.querySelector('#new_title')
+                dom.addNewCardToBoard(customTitle.value, cardContainers);
+                dom.closeModal()
+                // dataHandler.createNewCard(boardId, customTitle.value, statusId, cardOrder) //TODO
+                // .then(dom.loadBoards);
+            }
+         },
+         addNewCardToBoard: function(customTitle, cardContainers) {
+            let cardContainer = cardContainers.nextSibling.nextSibling;
+            let lastCard = cardContainer.querySelector(".board-column-content");
+            lastCard.insertAdjacentHTML("beforeend", `
+                            <div class="card">
+                            <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
+                            <div class="card-title">${customTitle}</div>
+                            </div>`);
         }
 };
 
