@@ -59,9 +59,33 @@ def get_all_cards(cursor, username):
     LEFT JOIN users u
         ON b.user_id = u.id
     WHERE b.user_id IS NULL OR u.name = %(username)s
-    ORDER BY c.id
+    ORDER BY c.card_order
     """
     var = {'username': username}
     cursor.execute(query, var)
     return cursor.fetchall()
 
+
+@connection.connection_handler
+def update_card_data(cursor, card_id, board_id, status_id):
+    query = """
+        UPDATE cards
+        SET board_id = %(board_id)s, status_id = %(status_id)s
+        WHERE id = %(card_id)s;
+        """
+    var = {'card_id': card_id, 'board_id': board_id, 'status_id': status_id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
+def update_cards_order(cursor, new_order):
+    new_position = 0
+    for card_id in new_order:
+        query = """
+                UPDATE cards
+                SET card_order = %(new_position)s
+                WHERE id = %(card_id)s;
+                """
+        var = {'card_id': card_id, 'new_position': new_position}
+        cursor.execute(query, var)
+        new_position += 1

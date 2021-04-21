@@ -71,6 +71,7 @@ export let dataHandler = {
     })
     },
 
+
     getStatus: function (statusId, callback) {
         // the status is retrieved and then the callback function is called with the status
     },
