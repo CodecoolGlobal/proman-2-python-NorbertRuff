@@ -71,6 +71,11 @@ export let dataHandler = {
     })
     },
 
+    updateCards: function (data){
+        this._api_post('/update-cards', data, () => {
+        });
+    },
+
 
     getStatus: function (statusId, callback) {
         // the status is retrieved and then the callback function is called with the status

@@ -93,7 +93,7 @@ export let dom = {
            let board = document.querySelector(`#board-id-${card.board_id}`)
            let column = board.querySelector(`#status-id-${card.status_id}`)
            column.insertAdjacentHTML('beforeend', `
-                <div class="card" draggable="true">
+                <div id="card-id-${card['id']}" class="card" draggable="true">
                     <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
                     <div class="card-title">${card.title}</div>
                 </div>
@@ -103,7 +103,6 @@ export let dom = {
 
     initCollapseBoard: () => {
         let toggleButtons = document.querySelectorAll(".board-toggle");
-        console.log(toggleButtons)
         for (let button of toggleButtons) {
             button.firstChild.classList.remove('fa-chevron-down') // set default to up button
             button.firstChild.classList.add('fa-chevron-up')      // set default to up button
@@ -128,26 +127,32 @@ export let dom = {
             })
             draggable.addEventListener('dragend', () => {
             draggable.classList.remove('dragging');
+            let cardID = draggable.getAttribute('id').match(/[0-9]+/)[0]
+            let statusID =  draggable.parentNode.getAttribute('id').match(/[0-9]+/)[0]
+            let boardID = draggable.closest('.board').getAttribute('id').match(/[0-9]+/)[0]
+            let allCardsInStatus = dom.getAllCardsIDFromStatus(draggable)
+            dataHandler.updateCards({'card_id': cardID, 'status_id': statusID, 'board_id': boardID, 'cards_order': allCardsInStatus})
             })
         })
         containers.forEach(container => {
-            container.addEventListener('dragover', (e) => {
-                const afterElement = dom.getDragAfterElement(container, e.clientY);
+            container.addEventListener('dragover', (event) => {
+            event.preventDefault();
+                const afterElement = dom.getDragAfterElement(container, event.clientY);
                 const draggable = document.querySelector('.dragging');
                 if (afterElement === undefined) {
                     let below = true;
-                    dom.insertElement(draggable, container, below, afterElement, draggables);
+                    dom.insertElement(draggable, container, below, afterElement);
                 }
                 else {
                     let below = false;
-                    dom.insertElement(draggable, container, below, afterElement, draggables);
+                    dom.insertElement(draggable, container, below, afterElement);
                 }
             })
-        })
+
+       })
     },
 
-    insertElement: (draggable, container, below, afterElement, draggables) => {
-        const containerClass = container.getAttribute('class');
+    insertElement: (draggable, container, below, afterElement) => {
             if (below) {
                 container.appendChild(draggable);
             }
@@ -168,8 +173,14 @@ export let dom = {
             return closest;
         }
     }, {offset: Number.NEGATIVE_INFINITY}).element;
-    }
+    },
 
+    getAllCardsIDFromStatus: (draggable) => {
+        let allCardsInStatus = [...draggable.parentNode.children]
+        return allCardsInStatus.map((item) => {
+            return item.getAttribute('id').match(/[0-9]+/)[0]
+        })
+    },
 };
 
 
