@@ -24,6 +24,18 @@ def update_table_title(cursor, new_name, id):
 
 
 @connection.connection_handler
+def get_card_title(cursor, card_id):
+    query = """
+        SELECT title 
+        FROM cards
+        WHERE id = %(id)s   
+        """
+    var = {'id': card_id}
+    cursor.execute(query, var)
+    return cursor.fetchone()
+
+
+@connection.connection_handler
 def update_card_title(cursor, new_name, id):
     query = """
         UPDATE cards 
