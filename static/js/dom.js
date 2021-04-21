@@ -19,12 +19,14 @@ export let dom = {
     },
     closeInputFields: function (evt){
         let inputField = dom.focusTarget.querySelector('input');
-        let isTargetArea = evt.composedPath().includes(dom.focusTarget)
+        let isTargetArea = evt.composedPath().includes(dom.focusTarget);
+        let cardID = dom.focusTarget.dataset.cardId;
         if (!isTargetArea){
             inputField.closest('.card-title').childNodes[2].textContent = '';
             inputField.classList.remove('display-flex-element');
             inputField.classList.add('hide-element');
-            inputField.after(inputField.value)
+            dataHandler.getCardTitle({'card_id': cardID})
+                .then((response) => inputField.after(response['title']))
         }
     },
     loadBoards: function () {

@@ -70,6 +70,13 @@ export let dataHandler = {
         });
     })
     },
+    getCardTitle: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/get-card-title', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
     updateCardTitle: function (data){
         return new Promise ((resolve, reject) => {
             this._api_post('/update-card-title', data,(response) => {
