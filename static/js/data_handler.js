@@ -23,12 +23,12 @@ export let dataHandler = {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
-                'Content-Type': 'application/json',
+                "content-type": "application/json"
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
         })
-        .then(response => response.json())  // parse the response as JSON
-        .then(json_response => callback(json_response));  // Call the `callback` with the returned object
+        .then(response => response.json())
+        .then(json_response => callback(json_response));
     },
     init: function () {
     },
@@ -59,6 +59,13 @@ export let dataHandler = {
         return new Promise ((resolve, reject) => {
             this._api_get('/get-cards', (response) => {
             this._data['cards'] = response;
+            resolve(response)
+        });
+    })
+    },
+    boardNameChange: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/save-new-name', data,(response) => {
             resolve(response)
         });
     })

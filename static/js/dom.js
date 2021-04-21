@@ -6,6 +6,7 @@ export let dom = {
         let addNewPublicBoardBTN = document.querySelector("#add_public_board");
         addNewPublicBoardBTN.addEventListener('click', addNewPBoard);
         // This function should run once, when the page is loaded.
+        document.querySelector('.close').addEventListener('click', this.closeModal)
     },
     loadBoards: function () {
         // retrieves boards and makes showBoards called
@@ -19,9 +20,11 @@ export let dom = {
             dom.showBoards(boards);
             dom.showDefaultStatuses(defaultStatuses);
             dom.showCards(cards);
+            dom.initCollapseBoard()
         })
 
     },
+
     showBoards: function (boards) {
         let boardsContainer = document.querySelector('#boards');
         boardsContainer.innerHTML = ''
@@ -29,14 +32,46 @@ export let dom = {
         for (let board of boards){
             boardsContainer.insertAdjacentHTML('beforeend', `
             <section id="board-id-${board['id']}" class="board" data-board-id="${board['id']}">
-                <div class="board-header"><span class="board-title">${board['title']}</span>
+                <div class="board-header"><span data-board-title="${board.title}" class="board-title">${board['title']}</span>
                     <button class="board-add">Add Card</button>
                     <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
                 </div>
                 <div class="board-columns">Empty column</div>
             </section>
             ` );
+            let section = document.querySelector(`#board-id-${board['id']}`);
+            section.querySelector(`[data-board-title="${board.title}"]`).addEventListener('click', this.changeBoardName)
         }
+    },
+    changeBoardName: function (evt){
+        dom.modalBoardNameChange(evt)
+
+    },
+    closeModal: function (){
+        document.querySelector('.bg-modal').style.display = "none";
+    },
+
+    saveBoardNameChange: function (evt){
+        let newBoardName = document.querySelector('.modalInput').value;
+        let boardID = document.querySelector('.modalInput').id;
+        dataHandler.boardNameChange({"board_name": newBoardName, "id": boardID})
+            .then(() => document.querySelector(
+                `#board-id-${boardID} span`).innerHTML = newBoardName)
+            .then(() => document.querySelector('.bg-modal').style.display = 'none')
+    },
+
+    modalBoardNameChange: function (evt){
+        document.querySelector('.modal-content').innerHTML = '';
+        let parentSection = evt.target.parentNode.parentNode;
+        let boardID = parentSection.getAttribute('data-board-id');
+        let boardName = evt.target.dataset.boardTitle;
+        document.querySelector('.bg-modal').style.display = "block";
+        document.querySelector('.modal-content').insertAdjacentHTML(
+            'beforeend',
+            `<h2>Change board name</h2>
+                  <input id="${boardID}" class="modalInput" value="${boardName}">`)
+        document.querySelector('#saveChanges').addEventListener('click', this.saveBoardNameChange)
+
     },
 
     showDefaultStatuses: function (defaultStatuses) {
@@ -116,3 +151,21 @@ function createNewPBoard(customTitle){
             `);
 }
 
+    initCollapseBoard: () => {
+        let toggleButtons = document.querySelectorAll(".board-toggle");
+        console.log(toggleButtons)
+        for (let button of toggleButtons) {
+            button.firstChild.classList.remove('fa-chevron-down') // set default to up button
+            button.firstChild.classList.add('fa-chevron-up')      // set default to up button
+            button.addEventListener('click', dom.handleToggleButtonClick)
+        }
+    },
+
+    handleToggleButtonClick: (event) => {
+        let boardColumn = event.currentTarget.parentElement.parentElement.querySelector('.board-columns');
+        boardColumn.classList.toggle('hide-element');
+        event.currentTarget.firstChild.classList.toggle('fa-chevron-down')
+        event.currentTarget.firstChild.classList.toggle('fa-chevron-up')
+    }
+
+};

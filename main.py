@@ -1,6 +1,5 @@
-from flask import Flask, render_template, url_for, session, request
+from flask import Flask, render_template, url_for, session, request, jsonify
 from util import json_response
-
 
 import data_handler
 
@@ -13,6 +12,17 @@ def index():
     This is a one-pager which shows all the boards and cards
     """
     return render_template('index.html')
+
+
+@app.route("/save-new-name", methods=["POST"])
+def save_new_name():
+    new_name = request.get_json()['board_name']
+    board_id = request.get_json()['id']
+    try:
+        data_handler.save_new_table_name(new_name, board_id)
+        return jsonify({"response": "OK"})
+    except:
+        return jsonify({"response": "There was an error during execution of your request"})
 
 
 @app.route("/get-boards")
