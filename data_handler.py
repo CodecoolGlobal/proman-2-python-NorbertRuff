@@ -13,9 +13,20 @@ def get_card_status(status_id):
 
 
 @connection.connection_handler
-def save_new_table_name(cursor, new_name, id):
+def update_table_title(cursor, new_name, id):
     query = """
         UPDATE boards 
+        SET title = %(title)s
+        WHERE id = %(id)s    
+    """
+    var = {'title': new_name, 'id': id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
+def update_card_title(cursor, new_name, id):
+    query = """
+        UPDATE cards 
         SET title = %(title)s
         WHERE id = %(id)s    
     """
