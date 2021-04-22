@@ -8,6 +8,7 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = "bec725156bb840a9a722fba8b3a7597b"
 
+
 @app.route("/")
 def index():
     """
@@ -97,7 +98,6 @@ def create_card():
     return ""
 
 
-
 @app.route("/update-cards", methods=["POST"])
 def update_cards():
     card_id = request.get_json()['card_id']
@@ -112,14 +112,32 @@ def update_cards():
         return jsonify({"response": "There was an error during execution of your request"})
 
 
-
 @app.route("/register", methods=["POST", "GET"])
 def register():
     new_username = request.get_json()['new_username']
     new_password = password_hasher.hash_password(request.get_json()['new_password'])
-    data_handler.add_new_user(new_username, new_password)
-    return ""
+    try:
+        data_handler.add_new_user(new_username, new_password)
+        return jsonify({"response": "OK"})
+    except:
+        return jsonify({"response": "There was an error during the registration process"})
 
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    username = request.get_json()['username']
+    user_data = data_handler.get_user_login_data(username)
+    if len(user_data) == 1:
+        try:
+            password = request.get_json()['password']
+            hashed_password = user_data[0]["password"]
+            valid_password = password_hasher.verify_password(password, hashed_password)
+            if valid_password:
+                session["user"] = user_data[0]["name"]
+
+            return jsonify({"response": "OK"})
+        except:
+            return jsonify({"response": "There was an error during the registration process"})
 
 
 def main():

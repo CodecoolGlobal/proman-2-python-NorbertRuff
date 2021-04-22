@@ -23,7 +23,8 @@ export let dataHandler = {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
-                "content-type": "application/json"
+                "content-type": "application/json",
+                "Accept": "application/json"
             },
             body: JSON.stringify(data),
         })
@@ -121,10 +122,19 @@ export let dataHandler = {
         });
     },
     // here comes more features
-    createNewUser: function (new_username, new_password, callback){
+    createNewUser: function (new_username, new_password){
         let data = {'new_username': new_username, 'new_password': new_password}
         return new Promise ((resolve, reject) => {
             this._api_post('/register', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+
+    postLoginData: function (username, password) {
+        let data = {'username': username, 'password': password}
+        return new Promise ((resolve, reject) => {
+            this._api_post('/login', data,(response) => {
             resolve(response)
         });
     })

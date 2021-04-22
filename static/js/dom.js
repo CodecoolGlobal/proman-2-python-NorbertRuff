@@ -5,6 +5,7 @@ export let dom = {
     focusTarget: '',
     // This function should run once, when the page is loaded.
     init: function () {
+        dom.initLoginForm();
         dom.initRegistrationForm();
         dom.initNewPublicBoardButton();
         dom.initInputClose();
@@ -376,6 +377,10 @@ export let dom = {
             document.getElementById("sign-up").addEventListener('click', dom.showRegistrationForm)
         },
 
+        initLoginForm: function() {
+            document.body.insertAdjacentHTML("afterbegin", "<h3 id='login'>Login</h3>")
+            document.getElementById("login").addEventListener('click', dom.showLoginForm)
+        },
 
         createRegistrationModal: function(){
             let modalContent = document.querySelector('.modal-content')
@@ -384,7 +389,7 @@ export let dom = {
                   <h2>Please enter your username and password</h2>
                   <label for="new_username">Username:</label>
                   <input id="new_username" class="modalInput"><br>
-                  <label for="new_username">Password:</label>
+                  <label for="new_password">Password:</label>
                   <input id="new_password" class="modalInput">
             `);
         },
@@ -392,20 +397,52 @@ export let dom = {
         showRegistrationForm: function() {
             dom.showModal()
             dom.createRegistrationModal()
-            dom.initRegistrationSubmit()
+            dom.initRegistrationDataSubmit()
         },
 
-        initRegistrationSubmit: function() {
+        initRegistrationDataSubmit: function() {
             document.querySelector('#saveChanges').onclick = function() {
-                dom.getDataFromRegistrationForm();
+                dom.postDataFromRegistrationForm();
             }
         },
 
-        getDataFromRegistrationForm: function() {
+        postDataFromRegistrationForm: function() {
             let new_username = document.getElementById("new_username").value
             let new_password = document.getElementById("new_password").value
             dom.closeModal()
             dataHandler.createNewUser(new_username, new_password).then(dom.loadBoards)
-        }
+        },
+
+        showLoginForm: function() {
+            dom.showModal()
+            dom.createLoginModal()
+            dom.initLoginDataSubmit()
+        },
+
+        createLoginModal: function(){
+            let modalContent = document.querySelector('.modal-content')
+            modalContent.innerHTML = '';
+            modalContent.insertAdjacentHTML('beforeend', `
+                  <h2>Please enter your username and password</h2>
+                  <label for="username">Username:</label>
+                  <input id="username" class="modalInput"><br>
+                  <label for="password">Password:</label>
+                  <input id="password" class="modalInput">
+            `);
+        },
+
+        initLoginDataSubmit: function() {
+            document.querySelector('#saveChanges').onclick = function() {
+                dom.postDataFromLoginForm();
+            }
+        },
+
+        postDataFromLoginForm: function() {
+            let username = document.getElementById("username").value
+            let password = document.getElementById("password").value
+            console.log(username, password)
+            dom.closeModal()
+            dataHandler.postLoginData(username, password).then(dom.loadBoards)
+        },
 };
 
