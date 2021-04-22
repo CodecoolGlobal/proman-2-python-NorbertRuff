@@ -122,6 +122,12 @@ section.board{
     padding: 10px;
 }
 
+.board-container-buttons {
+    margin: 0 25px;
+    display: flex;
+    justify-content: flex-end;
+}
+
 .board-column:nth-of-type(1) .card{
     background: var(--status-1);
 }
