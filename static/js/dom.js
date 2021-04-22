@@ -104,6 +104,12 @@ export let dom = {
         boardsContainer.innerHTML = ''
         boardsContainer.classList.add('board-container')
         for (let board of boards){
+            let addPrivateClass
+            if (board.user_id === null) {
+                addPrivateClass = ""
+            } else {
+                addPrivateClass = "board-private"
+            }
             boardsContainer.insertAdjacentHTML('beforeend', `
             <section id="board-id-${board['id']}" class="board ${addPrivateClass}" data-board-id="${board['id']}">
                 <div class="board-header">
@@ -435,7 +441,8 @@ export let dom = {
             let modalContent = document.querySelector('.modal-content')
             modalContent.innerHTML = '';
             modalContent.insertAdjacentHTML('beforeend', `
-                  <h2>Please enter your username and password</h2>
+                  <h2>Sign Up</h2>
+                  <br>
                   <label for="new_username">Username:</label>
                   <input id="new_username" class="modalInput"><br><br>
                   <label for="new_password">Password:</label>
@@ -496,20 +503,18 @@ export let dom = {
 
         initHeader: function() {
             dataHandler.getLoggedInUser().then(function(data) {
-                if (data.username == "") {
-                    document.getElementById("login").style.visibility = "visible";
-                    document.getElementById("sign-up").style.visibility = "visible";
-                    document.getElementById("logout").style.visibility = "hidden";
-                    document.getElementById("user-display").style.visibility = "hidden";
-                    document.getElementById("add_private_board").style.visibility = "hidden";
-                }
-                else {
-                    document.getElementById("login").style.visibility = "hidden";
-                    document.getElementById("sign-up").style.visibility = "hidden";
-                    document.getElementById("logout").style.visibility = "visible";
-                    document.getElementById("user-display").style.visibility = "visible";
-                    document.getElementById("user-display").innerHTML = data.username;
-                    document.getElementById("add_private_board").style.visibility = "visible";
+                if (data.username === "") {
+                    document.getElementById("login").classList.remove('hide-element');
+                    document.getElementById("sign-up").classList.remove('hide-element');
+                    document.getElementById("logout").classList.add('hide-element');
+                    document.getElementById("user-display").classList.add('hide-element');
+                    document.getElementById("add_private_board").classList.add('hide-element');
+                } else {
+                    document.getElementById("login").classList.add('hide-element');
+                    document.getElementById("sign-up").classList.add('hide-element');
+                    document.getElementById("logout").classList.remove('hide-element');
+                    document.getElementById("user-display").classList.remove('hide-element');
+                    document.getElementById("add_private_board").classList.remove('hide-element');
                 }
             })
         }
