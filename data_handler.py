@@ -141,6 +141,20 @@ def remove_card(cursor, card_id):
 
 
 @connection.connection_handler
+def remove_board(cursor, board_id):
+    query = """
+        DELETE FROM cards
+        WHERE board_id = %(board_id)s;
+        DELETE FROM custom_board_statuses
+        WHERE board_id = %(board_id)s; 
+        DELETE FROM boards
+        WHERE id = %(board_id)s;
+        """
+    var = {'board_id': board_id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
 def update_cards_order(cursor, new_order):
     new_position = 0
     for card_id in new_order:
