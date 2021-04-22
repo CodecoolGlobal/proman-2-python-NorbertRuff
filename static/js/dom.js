@@ -105,9 +105,11 @@ export let dom = {
                 <div class="board-header">
                     <span data-board-title="${board.title}" class="board-title">${board['title']}</span>
                     <span class="flex-grow-max"></span>
+                    <button data-button-functionality="delete-board" class="button-pure">
+                        <i class="board-delete fas fa-trash-alt"></i>
+                    </button>
                     <button data-button-functionality="card" class="card-add">Add Card</button>
                     <button data-button-functionality="column" class="board-add">Add Column</button>
-                    <div class="board-remove"><i class="board-delete fas fa-trash-alt"></i></div>
                     <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
                 </div>
                 <div class="board-columns">Empty column</div>
@@ -198,6 +200,8 @@ export let dom = {
         addCol.classList.toggle('hide-element')
         let addCard = event.currentTarget.closest('.board-header').querySelector('[data-button-functionality="card"]');
         addCard.classList.toggle('hide-element')
+        let delBoard = event.currentTarget.closest('.board-header').querySelector('[data-button-functionality="delete-board"]');
+        delBoard.classList.toggle('hide-element')
     },
 
     initDragAndDrop: () => {
