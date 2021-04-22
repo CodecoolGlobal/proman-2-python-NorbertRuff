@@ -34,8 +34,7 @@ export let dom = {
             let cardID = dom.focusTarget.dataset.cardId;
             if (!isTargetArea){
                 inputField.closest('.card-title').childNodes[2].textContent = '';
-                inputField.classList.remove('display-flex-element');
-                inputField.classList.add('hide-element');
+                inputField.classList.toggle('hide-element');
                 dataHandler.getCardTitle({'card_id': cardID})
                     .then((response) => inputField.after(response['title']))
             }
@@ -49,14 +48,13 @@ export let dom = {
         },
 
     addNewColumn: function (evt){
-        evt.stopImmediatePropagation();
-        evt.preventDefault();
+        let boardID = evt.target.closest('section').dataset.boardId;
         dom.showModal();
         dom.createModal('column')
         let columnArea = evt.currentTarget.closest('section').querySelector(".board-columns");
         document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title');
-            dataHandler.newStatus({"title": customTitle.value})
+            dataHandler.newStatus({"title": customTitle.value, "board_id": boardID})
                 .then((response) =>
                     columnArea.insertAdjacentHTML(
                         'beforeend', `
@@ -67,18 +65,38 @@ export let dom = {
             dom.closeModal()
         }
     },
+    showCustomStatuses: function (customStatuses){
+        console.log(customStatuses)
+        let boardsContainer = document.querySelector('#boards');
+        for (let child of boardsContainer.children) {
+            let boardID = child.dataset.boardId;
+            let columnContent = child.querySelector(".board-columns");
+                for (let status of customStatuses) {
+                    if(status['board_id'] === parseInt(boardID)){
+                        columnContent.insertAdjacentHTML('beforeend', `
+                        <div class="board-column">
+                        <div class="board-column-title">${status['title']}</div>
+                        <div id="status-id-${status['status_id']}" class="board-column-content" data-status-id="${status['status_id']}"></div>
+                        </div>`)
+                    }
+                }
+        }
+    },
 
     loadBoards: function () {
         // retrieves boards and makes showBoards called
         let promise1 = dataHandler.getBoards()
         let promise2 = dataHandler.getDefaultStatuses()
         let promise3 = dataHandler.getCards()
-        Promise.all([promise1, promise2, promise3]).then((data) => {
+        let promise4 = dataHandler.getCustomStatuses()
+        Promise.all([promise1, promise2, promise3, promise4]).then((data) => {
             let boards = data[0]
             let defaultStatuses = data[1]
             let cards = data[2]
+            let customStatuses = data[3]
             dom.showBoards(boards);
             dom.showDefaultStatuses(defaultStatuses);
+            dom.showCustomStatuses(customStatuses)
             dom.showCards(cards);
             dom.setDefaultFocusTarget();
             dom.initCollapseBoard();
@@ -113,8 +131,8 @@ export let dom = {
     },
     changeBoardName: function (evt){
         dom.modalBoardNameChange(evt)
-
     },
+
     closeModal: function (){
         document.querySelector('.bg-modal').style.display = "none";
     },
