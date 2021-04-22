@@ -5,7 +5,6 @@ export let dom = {
     // This function should run once, when the page is loaded.
     init: function () {
         dom.initNewBoardButtons();
-        dom.initNewBoardButtons();
         dom.initHeader();
         dom.initLoginForm();
         dom.initRegistrationForm();
@@ -108,7 +107,6 @@ export let dom = {
             dom.showCustomStatuses(customStatuses)
             dom.showCards(cards);
             dom.initHeader();
-            dom.setDefaultFocusTarget();
             dom.initCollapseBoard();
             dom.initAddNewColumnListeners()
             dom.initCardEventListeners();
@@ -288,15 +286,12 @@ export let dom = {
 
     closeInput: function (evt){
         let inputField = evt.target.querySelector('input');
-        let cardID = dom.focusTarget.dataset.cardId;
+        let cardID = inputField.closest('.card').dataset.cardId;
         if(!inputField.classList.contains('hide-element')){
             inputField.closest('.card-title').childNodes[2].textContent = '';
             inputField.classList.add('hide-element');
             dataHandler.getCardTitle({'card_id': cardID})
                 .then((response) => inputField.after(response['title']))
-        }
-        for(let cardDeleteButton of cardDeleteButtons){
-            cardDeleteButton.addEventListener('click', dom.deleteCard)
         }
     },
     deleteBoard: function(event){
@@ -520,7 +515,7 @@ export let dom = {
                   <label for="username">Username:</label>
                   <input id="username" class="modalInput"><br><br>
                   <label for="password">Password:</label>
-                  <input id="password" class="modalInput">
+                  <input type="password" id="password" class="modalInput">
             `);
         },
 
