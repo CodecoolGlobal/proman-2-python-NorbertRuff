@@ -107,6 +107,7 @@ export let dom = {
                     <span class="flex-grow-max"></span>
                     <button data-button-functionality="card" class="card-add">Add Card</button>
                     <button data-button-functionality="column" class="board-add">Add Column</button>
+                    <div class="board-remove"><i class="board-delete fas fa-trash-alt"></i></div>
                     <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
                 </div>
                 <div class="board-columns">Empty column</div>
@@ -114,6 +115,7 @@ export let dom = {
             ` );
             let section = document.querySelector(`#board-id-${board['id']}`);
             section.querySelector(`[data-board-title="${board.title}"]`).addEventListener('click', this.changeBoardName)
+            section.querySelector(".board-delete").addEventListener('click', dom.deleteBoard)
         }
     },
     changeBoardName: function (evt){
@@ -170,7 +172,7 @@ export let dom = {
            let column = board.querySelector(`#status-id-${card.status_id}`)
            column.insertAdjacentHTML('beforeend',
                `<div id="card-id-${card['id']}" data-card-id="${card.id}" class="card" draggable="true">
-                    <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
+                    <div class="card-remove"><i class="card-delete fas fa-trash-alt"></i></div>
                     <div class="card-title">
                         <input value="${card.title}" class="card-title-change hide-element">${card.title}
                     </div>
@@ -234,7 +236,7 @@ export let dom = {
 
     initCardEventListeners: function(){
         let cards = document.querySelectorAll('.card');
-        let cardDeleteButtons = document.querySelectorAll('.fa-trash-alt');
+        let cardDeleteButtons = document.querySelectorAll('.card-delete.fa-trash-alt');
         let inputFields = document.querySelectorAll('.card-title-change');
         for(let card of cards){
             card.addEventListener('click', dom.showCardTitleInput)
@@ -246,7 +248,12 @@ export let dom = {
             cardDeleteButton.addEventListener('click', dom.deleteCard)
         }
     },
-
+    deleteBoard: function(event){
+        let board = event.target.closest("section");
+        let boardId = board.dataset.boardId;
+        dataHandler.removeBoard(boardId)
+            .then(() => board.remove())
+    },
     deleteCard: function(event){
         let card = event.target.parentElement.parentElement
         let cardId = card.dataset.cardId;

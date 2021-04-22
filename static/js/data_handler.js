@@ -97,6 +97,13 @@ export let dataHandler = {
         });
     })
     },
+    removeBoard: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/remove-board', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
     newStatus: function (data) {
         return new Promise ((resolve, reject) => {
             this._api_post('/new-status', data,(response) => {

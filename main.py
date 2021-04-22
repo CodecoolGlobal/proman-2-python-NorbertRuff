@@ -49,6 +49,16 @@ def remove_card():
         return jsonify({"response": "There was an error during execution of your request"})
 
 
+@app.route("/remove-board", methods=["POST"])
+def remove_board():
+    board_id = request.get_json()
+    try:
+        data_handler.remove_board(board_id)
+        return jsonify({"response": "OK"})
+    except:
+        return jsonify({"response": "There was an error during execution of your request"})
+
+
 @app.route("/update-board-title", methods=["POST"])
 def update_board_title():
     new_name = request.get_json()['board_name']
