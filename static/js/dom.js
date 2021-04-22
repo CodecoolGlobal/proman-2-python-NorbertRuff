@@ -500,7 +500,7 @@ export let dom = {
                   <label for="new_username">Username:</label>
                   <input id="new_username" class="modalInput"><br><br>
                   <label for="new_password">Password:</label>
-                  <input id="new_password" class="modalInput">
+                  <input id="new_password" class="modalInput" type="password">
             `);
         },
 
@@ -600,6 +600,7 @@ export let dom = {
         showArchivedMessages: () => {
             dom.showModal()
             dom.createArchivedCardsModal()
+            document.querySelector('#saveChanges').innerHTML = "Save changes"
             document.querySelector('#saveChanges').onclick = function() {
                 dom.closeModal()
             }

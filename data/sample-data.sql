@@ -61,12 +61,13 @@ ALTER TABLE ONLY custom_board_statuses ADD CONSTRAINT fk_board_id FOREIGN KEY (b
 
 INSERT INTO users (id, name, password) VALUES(1, 'test@password.com', '$2b$12$M.2KydyGpc7A4eSrXtEQ5eOVWrkZ.Ca8wh.teN7HpPJLl3mMAhToe');
 INSERT INTO users (id, name, password) VALUES(2, 'hello@hello.com', '$2b$12$z92lNTdi1s1k.oUsYz1fM.C5T133MyaXJpqmDZqThpu7EruHUrYjK');
-SELECT pg_catalog.setval('users_id_seq', 2, true);
+INSERT INTO users (id, name, password) VALUES(3, 'hello', '$2b$12$ffxGXjv3LwzDZJ.N.1Nmxe6lW8gLioqjX5UQTtaMvZZuDjx2vkCY6');
+SELECT pg_catalog.setval('users_id_seq', 3, true);
 
 
-INSERT INTO boards (id, title, user_id) VALUES(1, 'Board 1', null);
-INSERT INTO boards (id, title, user_id) VALUES(2, 'Board 2', null);
-INSERT INTO boards (id, title, user_id) VALUES(3, 'Priv Board 3', 1);
+INSERT INTO boards (id, title, user_id) VALUES(1, 'Web module TODO', null);
+INSERT INTO boards (id, title, user_id) VALUES(2, 'Codecool public', null);
+INSERT INTO boards (id, title, user_id) VALUES(3, 'My private board', 3);
 SELECT pg_catalog.setval('boards_id_seq', 3, true);
 
 
@@ -74,15 +75,15 @@ INSERT INTO statuses (id, title, is_default) VALUES(0, 'new', true);
 INSERT INTO statuses (id, title, is_default) VALUES(1, 'in progress', true);
 INSERT INTO statuses (id, title, is_default) VALUES(2, 'testing', true);
 INSERT INTO statuses (id, title, is_default) VALUES(3, 'done', true);
-INSERT INTO statuses (id, title, is_default) VALUES(4, 'hello', false);
-SELECT pg_catalog.setval('statuses_id_seq', 4, true);
+SELECT pg_catalog.setval('statuses_id_seq', 3, true);
 
 
-INSERT INTO cards (id,board_id,title,status_id,card_order, archived) VALUES (1, 1, 'new card 1', 0, 0, false);
-INSERT INTO cards (id,board_id,title,status_id,card_order, archived) VALUES (2, 1, 'new card 2', 0, 1, false);
-INSERT INTO cards (id,board_id,title,status_id,card_order, archived) VALUES (3, 2, 'in progress card', 1, 0, false);
-INSERT INTO cards (id,board_id,title,status_id,card_order, archived) VALUES (4, 3, 'card on priv board', 3, 0, false);
-SELECT pg_catalog.setval('cards_id_seq', 4, true);
+INSERT INTO cards (id,board_id,title,status_id,card_order, archived) VALUES (1, 1, 'Prepping for demo', 1, 0, false);
+INSERT INTO cards (id,board_id,title,status_id,card_order, archived) VALUES (2, 1, 'Implementing creative solutions', 2, 1, false);
+INSERT INTO cards (id,board_id,title,status_id,card_order, archived) VALUES (3, 2, 'Working overtime', 1, 0, false);
+INSERT INTO cards (id,board_id,title,status_id,card_order, archived) VALUES (4, 3, 'Getting frustrated due to bugs', 3, 2, false);
+INSERT INTO cards (id,board_id,title,status_id,card_order, archived) VALUES (5, 3, 'Adding cutting edge design', 3, 1, false);
+INSERT INTO cards (id,board_id,title,status_id,card_order, archived) VALUES (6, 2, 'Dont forget about PA!!!', 0, 0, false);
+INSERT INTO cards (id,board_id,title,status_id,card_order, archived) VALUES (7, 2, 'Rock the demo', 2, 0, false);
+SELECT pg_catalog.setval('cards_id_seq', 7, true);
 
-
-INSERT INTO custom_board_statuses (board_id, status_id) VALUES (1, 4);

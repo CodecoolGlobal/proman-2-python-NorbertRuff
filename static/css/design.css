@@ -250,7 +250,7 @@ section.board-private {
     justify-content: center;
     margin: 15% auto;
     padding: 20px;
-    width: 25vw;
+    width: 300px;
     border: 1px solid #cccccc;
     background-color: #f5f5f5;
     border-radius: 3px;
@@ -285,7 +285,7 @@ section.board-private {
   top: 20px;
   font-size: 20px;
   font-weight: bold;
-    padding-right: 10px;
+
 }
 .close:hover,
 .close:focus {
