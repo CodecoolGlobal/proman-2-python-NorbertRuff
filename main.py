@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, session, request, jsonify
+from flask import Flask, render_template, redirect, url_for, session, request, jsonify
 from util import json_response
 import password_hasher
 
@@ -59,7 +59,7 @@ def get_boards():
     """
     All the boards
     """
-    username = session.get('username', 'test@password.com')
+    username = session.get('username', None)
     return data_handler.get_boards(username)
 
 
@@ -75,7 +75,7 @@ def get_default_statuses():
 @app.route("/get-cards")
 @json_response
 def get_all_cards():
-    username = session.get('username', 'test@password.com')
+    username = session.get('username', "")
     return data_handler.get_all_cards(username)
 
 
@@ -125,19 +125,35 @@ def register():
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
-    username = request.get_json()['username']
-    user_data = data_handler.get_user_login_data(username)
-    if len(user_data) == 1:
-        try:
-            password = request.get_json()['password']
-            hashed_password = user_data[0]["password"]
-            valid_password = password_hasher.verify_password(password, hashed_password)
-            if valid_password:
-                session["user"] = user_data[0]["name"]
+    if request.method == "POST":
+        username = request.get_json()['username']
+        user_data = data_handler.get_user_login_data(username)
+        if len(user_data) == 1:
+            try:
+                password = request.get_json()['password']
+                hashed_password = user_data[0]["password"]
+                valid_password = password_hasher.verify_password(password, hashed_password)
+                if valid_password:
+                    session["username"] = user_data[0]["name"]
 
-            return jsonify({"response": "OK"})
-        except:
-            return jsonify({"response": "There was an error during the registration process"})
+                return jsonify({"response": "OK"})
+            except:
+                return jsonify({"response": "There was an error during the login process"})
+    elif request.method == "GET":
+        return redirect(url_for('index'))
+
+
+@app.route('/get-logged-in-user')
+def logged_in_user():
+    user_in_session = session.get("username", "")
+    print(user_in_session)
+    return jsonify({"username": user_in_session})
+
+
+@app.route('/logout')
+def logout():
+    session.pop("username", None)
+    return redirect(url_for("index"))
 
 
 def main():

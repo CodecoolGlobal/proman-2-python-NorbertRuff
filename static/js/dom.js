@@ -5,6 +5,7 @@ export let dom = {
     focusTarget: '',
     // This function should run once, when the page is loaded.
     init: function () {
+        dataHandler.getLoggedInUser().then(r => console.log(r.username));
         dom.initLoginForm();
         dom.initRegistrationForm();
         dom.initNewPublicBoardButton();
@@ -440,7 +441,6 @@ export let dom = {
         postDataFromLoginForm: function() {
             let username = document.getElementById("username").value
             let password = document.getElementById("password").value
-            console.log(username, password)
             dom.closeModal()
             dataHandler.postLoginData(username, password).then(dom.loadBoards)
         },

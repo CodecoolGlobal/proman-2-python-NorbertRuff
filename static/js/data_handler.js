@@ -138,5 +138,13 @@ export let dataHandler = {
             resolve(response)
         });
     })
-    }
+    },
+    getLoggedInUser: function () {
+        return new Promise ((resolve, reject) => {
+            this._api_get('/get-logged-in-user', (response) => {
+            //this._data['username'] = response;
+            resolve(response)
+        });
+    })
+    },
 };
