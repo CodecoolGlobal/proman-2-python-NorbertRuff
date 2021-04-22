@@ -154,6 +154,31 @@ export let dataHandler = {
              resolve(response)
         });
         });
-    }
+    },
     // here comes more features
+    createNewUser: function (new_username, new_password){
+        let data = {'new_username': new_username, 'new_password': new_password}
+        return new Promise ((resolve, reject) => {
+            this._api_post('/register', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+
+    postLoginData: function (username, password) {
+        let data = {'username': username, 'password': password}
+        return new Promise ((resolve, reject) => {
+            this._api_post('/login', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+    getLoggedInUser: function () {
+        return new Promise ((resolve, reject) => {
+            this._api_get('/get-logged-in-user', (response) => {
+            //this._data['username'] = response;
+            resolve(response)
+        });
+    })
+    },
 };

@@ -106,12 +106,12 @@ def get_user_id(cursor, username):
 @connection.connection_handler
 def get_boards(cursor, username):
     query = """
-            SELECT boards.id, boards.title
+            SELECT boards.id, boards.title, boards.user_id
             FROM boards
             LEFT JOIN users
                  ON boards.user_id = users.id
             WHERE users.name = %(username)s OR boards.user_id IS NULL
-            ORDER BY id;
+            ORDER BY boards.user_id DESC, boards.title;
             """
     var = {'username': username}
     cursor.execute(query, var)
@@ -220,3 +220,35 @@ def update_cards_order(cursor, new_order):
         var = {'card_id': card_id, 'new_position': new_position}
         cursor.execute(query, var)
         new_position += 1
+
+
+@connection.connection_handler
+def add_new_user(cursor, new_username, new_password):
+    query = """
+        INSERT INTO users
+        VALUES (DEFAULT, %(new_username)s, %(new_password)s);
+        """
+    var = {'new_username': new_username, 'new_password': new_password}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
+def get_user_login_data(cursor, username):
+    query = """
+        SELECT name, password FROM users
+        WHERE name = %(username)s
+        """
+    var = {'username': username}
+    cursor.execute(query, var)
+    return cursor.fetchall()
+
+
+@connection.connection_handler
+def get_user_id_from_username(cursor, username):
+    query = """
+        SELECT id FROM users
+        WHERE name = %(username)s
+        """
+    var = {'username': username}
+    cursor.execute(query, var)
+    return cursor.fetchone()

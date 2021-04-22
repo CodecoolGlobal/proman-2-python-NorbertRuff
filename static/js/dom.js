@@ -5,6 +5,11 @@ export let dom = {
     // This function should run once, when the page is loaded.
     init: function () {
         dom.initNewBoardButtons();
+        dom.initNewBoardButtons();
+        dom.initHeader();
+        dom.initLoginForm();
+        dom.initRegistrationForm();
+        dom.initInputClose();
         dom.initModalClose();
     },
 
@@ -16,7 +21,6 @@ export let dom = {
         let addNewPrivateBoardButton = document.querySelector("#add_private_board");
         addNewPrivateBoardButton.addEventListener('click', dom.initNewBoardCreate);
     },
-
 
     initModalClose: function (){
         document.querySelector('.close').addEventListener('click', this.closeModal)
@@ -104,6 +108,8 @@ export let dom = {
             dom.showDefaultStatuses(defaultStatuses);
             dom.showCustomStatuses(customStatuses)
             dom.showCards(cards);
+            dom.initHeader();
+            dom.setDefaultFocusTarget();
             dom.initCollapseBoard();
             dom.initAddNewColumnListeners()
             dom.initCardEventListeners();
@@ -118,8 +124,14 @@ export let dom = {
         boardsContainer.innerHTML = ''
         boardsContainer.classList.add('board-container')
         for (let board of boards){
+            let addPrivateClass
+            if (board.user_id === null) {
+                addPrivateClass = ""
+            } else {
+                addPrivateClass = "board-private"
+            }
             boardsContainer.insertAdjacentHTML('beforeend', `
-            <section id="board-id-${board['id']}" class="board" data-board-id="${board['id']}">
+            <section id="board-id-${board['id']}" class="board ${addPrivateClass}" data-board-id="${board['id']}">
                 <div class="board-header">
                     <span data-board-title="${board.title}" class="board-title">${board['title']}</span>
                     <span class="flex-grow-max"></span>
@@ -281,8 +293,10 @@ export let dom = {
             dataHandler.getCardTitle({'card_id': cardID})
                 .then((response) => inputField.after(response['title']))
         }
+        for(let cardDeleteButton of cardDeleteButtons){
+            cardDeleteButton.addEventListener('click', dom.deleteCard)
+        }
     },
-
     deleteBoard: function(event){
         let board = event.target.closest("section");
         let boardId = board.dataset.boardId;
@@ -366,7 +380,6 @@ export let dom = {
         dom.createModal("Board")
         document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title')
-            console.log(event.target.id)
             if (event.target.id === "add_public_board") {
                 dataHandler.createNewPublicBoard(customTitle.value)
                 .then(dom.loadBoards);
@@ -449,6 +462,96 @@ export let dom = {
                             <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
                             <div class="card-title">${customTitle}</div>
                             </div>`);
+        },
+
+        initRegistrationForm: function() {
+            document.getElementById("sign-up").addEventListener('click', dom.showRegistrationForm)
+        },
+
+        initLoginForm: function() {
+            document.getElementById("login").addEventListener('click', dom.showLoginForm)
+        },
+
+        createRegistrationModal: function(){
+            let modalContent = document.querySelector('.modal-content')
+            modalContent.innerHTML = '';
+            modalContent.insertAdjacentHTML('beforeend', `
+                  <h2>Sign Up</h2>
+                  <br>
+                  <label for="new_username">Username:</label>
+                  <input id="new_username" class="modalInput"><br><br>
+                  <label for="new_password">Password:</label>
+                  <input id="new_password" class="modalInput">
+            `);
+        },
+
+        showRegistrationForm: function() {
+            dom.showModal()
+            dom.createRegistrationModal()
+            dom.initRegistrationDataSubmit()
+        },
+
+        initRegistrationDataSubmit: function() {
+            document.querySelector('#saveChanges').onclick = function() {
+                dom.postDataFromRegistrationForm();
+            }
+        },
+
+        postDataFromRegistrationForm: function() {
+            let new_username = document.getElementById("new_username").value
+            let new_password = document.getElementById("new_password").value
+            dom.closeModal()
+            dataHandler.createNewUser(new_username, new_password).then(dom.loadBoards)
+        },
+
+        showLoginForm: function() {
+            dom.showModal()
+            dom.createLoginModal()
+            dom.initLoginDataSubmit()
+        },
+
+        createLoginModal: function(){
+            let modalContent = document.querySelector('.modal-content')
+            modalContent.innerHTML = '';
+            modalContent.insertAdjacentHTML('beforeend', `
+                  <h2>Welcome Back</h2>
+                  <br>
+                  <label for="username">Username:</label>
+                  <input id="username" class="modalInput"><br><br>
+                  <label for="password">Password:</label>
+                  <input id="password" class="modalInput">
+            `);
+        },
+
+        initLoginDataSubmit: function() {
+            document.querySelector('#saveChanges').onclick = function() {
+                dom.postDataFromLoginForm();
+            }
+        },
+
+        postDataFromLoginForm: function() {
+            let username = document.getElementById("username").value
+            let password = document.getElementById("password").value
+            dom.closeModal()
+            dataHandler.postLoginData(username, password).then(dom.loadBoards)
+        },
+
+        initHeader: function() {
+            dataHandler.getLoggedInUser().then(function(data) {
+                if (data.username === "") {
+                    document.getElementById("login").classList.remove('hide-element');
+                    document.getElementById("sign-up").classList.remove('hide-element');
+                    document.getElementById("logout").classList.add('hide-element');
+                    document.getElementById("user-display").classList.add('hide-element');
+                    document.getElementById("add_private_board").classList.add('hide-element');
+                } else {
+                    document.getElementById("login").classList.add('hide-element');
+                    document.getElementById("sign-up").classList.add('hide-element');
+                    document.getElementById("logout").classList.remove('hide-element');
+                    document.getElementById("user-display").classList.remove('hide-element');
+                    document.getElementById("add_private_board").classList.remove('hide-element');
+                }
+            })
         }
 };
 
