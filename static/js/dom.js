@@ -6,6 +6,9 @@ export let dom = {
     // This function should run once, when the page is loaded.
     init: function () {
         dom.initNewBoardButtons();
+        dataHandler.getLoggedInUser().then(r => console.log(r.username));
+        dom.initLoginForm();
+        dom.initRegistrationForm();
         dom.initInputClose();
         dom.initModalClose();
     },
@@ -418,6 +421,78 @@ export let dom = {
                             <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
                             <div class="card-title">${customTitle}</div>
                             </div>`);
-        }
+        },
+
+        initRegistrationForm: function() {
+            document.body.insertAdjacentHTML("afterbegin", "<h3 id='sign-up'>Sign up</h3>")
+            document.getElementById("sign-up").addEventListener('click', dom.showRegistrationForm)
+        },
+
+        initLoginForm: function() {
+            document.body.insertAdjacentHTML("afterbegin", "<h3 id='login'>Login</h3>")
+            document.getElementById("login").addEventListener('click', dom.showLoginForm)
+        },
+
+        createRegistrationModal: function(){
+            let modalContent = document.querySelector('.modal-content')
+            modalContent.innerHTML = '';
+            modalContent.insertAdjacentHTML('beforeend', `
+                  <h2>Please enter your username and password</h2>
+                  <label for="new_username">Username:</label>
+                  <input id="new_username" class="modalInput"><br>
+                  <label for="new_password">Password:</label>
+                  <input id="new_password" class="modalInput">
+            `);
+        },
+
+        showRegistrationForm: function() {
+            dom.showModal()
+            dom.createRegistrationModal()
+            dom.initRegistrationDataSubmit()
+        },
+
+        initRegistrationDataSubmit: function() {
+            document.querySelector('#saveChanges').onclick = function() {
+                dom.postDataFromRegistrationForm();
+            }
+        },
+
+        postDataFromRegistrationForm: function() {
+            let new_username = document.getElementById("new_username").value
+            let new_password = document.getElementById("new_password").value
+            dom.closeModal()
+            dataHandler.createNewUser(new_username, new_password).then(dom.loadBoards)
+        },
+
+        showLoginForm: function() {
+            dom.showModal()
+            dom.createLoginModal()
+            dom.initLoginDataSubmit()
+        },
+
+        createLoginModal: function(){
+            let modalContent = document.querySelector('.modal-content')
+            modalContent.innerHTML = '';
+            modalContent.insertAdjacentHTML('beforeend', `
+                  <h2>Please enter your username and password</h2>
+                  <label for="username">Username:</label>
+                  <input id="username" class="modalInput"><br>
+                  <label for="password">Password:</label>
+                  <input id="password" class="modalInput">
+            `);
+        },
+
+        initLoginDataSubmit: function() {
+            document.querySelector('#saveChanges').onclick = function() {
+                dom.postDataFromLoginForm();
+            }
+        },
+
+        postDataFromLoginForm: function() {
+            let username = document.getElementById("username").value
+            let password = document.getElementById("password").value
+            dom.closeModal()
+            dataHandler.postLoginData(username, password).then(dom.loadBoards)
+        },
 };
 
