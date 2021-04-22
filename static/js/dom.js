@@ -103,8 +103,14 @@ export let dom = {
         boardsContainer.innerHTML = ''
         boardsContainer.classList.add('board-container')
         for (let board of boards){
+            let addPrivateClass
+            if (board.user_id === null) {
+                addPrivateClass = ""
+            } else {
+                addPrivateClass = "board-private"
+            }
             boardsContainer.insertAdjacentHTML('beforeend', `
-            <section id="board-id-${board['id']}" class="board" data-board-id="${board['id']}">
+            <section id="board-id-${board['id']}" class="board ${addPrivateClass}" data-board-id="${board['id']}">
                 <div class="board-header">
                     <span data-board-title="${board.title}" class="board-title">${board['title']}</span>
                     <span class="flex-grow-max"></span>
@@ -338,7 +344,6 @@ export let dom = {
         dom.createModal("Board")
         document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title')
-            console.log(event.target.id)
             if (event.target.id === "add_public_board") {
                 dataHandler.createNewPublicBoard(customTitle.value)
                 .then(dom.loadBoards);
@@ -435,9 +440,10 @@ export let dom = {
             let modalContent = document.querySelector('.modal-content')
             modalContent.innerHTML = '';
             modalContent.insertAdjacentHTML('beforeend', `
-                  <h2>Please enter your username and password</h2>
+                  <h2>Sign Up</h2>
+                  <br>
                   <label for="new_username">Username:</label>
-                  <input id="new_username" class="modalInput"><br>
+                  <input id="new_username" class="modalInput"><br><br>
                   <label for="new_password">Password:</label>
                   <input id="new_password" class="modalInput">
             `);
@@ -472,9 +478,10 @@ export let dom = {
             let modalContent = document.querySelector('.modal-content')
             modalContent.innerHTML = '';
             modalContent.insertAdjacentHTML('beforeend', `
-                  <h2>Please enter your username and password</h2>
+                  <h2>Welcome Back</h2>
+                  <br>
                   <label for="username">Username:</label>
-                  <input id="username" class="modalInput"><br>
+                  <input id="username" class="modalInput"><br><br>
                   <label for="password">Password:</label>
                   <input id="password" class="modalInput">
             `);
@@ -494,7 +501,9 @@ export let dom = {
         },
 
         initHeader: function() {
-            dataHandler.getLoggedInUser().then(data => );
+            dataHandler.getLoggedInUser().then(data => {
+
+            });
         }
 };
 

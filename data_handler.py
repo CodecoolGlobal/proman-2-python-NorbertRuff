@@ -61,12 +61,12 @@ def update_card_title(cursor, new_name, id):
 @connection.connection_handler
 def get_boards(cursor, username):
     query = """
-            SELECT boards.id, boards.title
+            SELECT boards.id, boards.title, boards.user_id
             FROM boards
             LEFT JOIN users
                  ON boards.user_id = users.id
             WHERE users.name = %(username)s OR boards.user_id IS NULL
-            ORDER BY id;
+            ORDER BY boards.user_id DESC, boards.title;
             """
     var = {'username': username}
     cursor.execute(query, var)

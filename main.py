@@ -28,7 +28,11 @@ def add_new_status():
 @app.route("/get-card-title", methods=["POST"])
 def get_card_title():
     card_id = request.get_json()['card_id']
-    return data_handler.get_card_title(card_id)
+    card_title = data_handler.get_card_title(card_id)
+    if card_title is None:
+        return {}
+    else:
+        return card_title
 
 
 @app.route("/update-card-title", methods=["POST"])
@@ -96,7 +100,11 @@ def get_default_statuses():
 @json_response
 def get_all_cards():
     username = session.get('username', "")
-    return data_handler.get_all_cards(username)
+    cards = data_handler.get_all_cards(username)
+    if cards is None:
+        return {}
+    else:
+        return cards
 
 
 @app.route("/create-board", methods=['POST'])
