@@ -6,7 +6,7 @@ export let dom = {
     // This function should run once, when the page is loaded.
     init: function () {
         dom.initNewBoardButtons();
-        dataHandler.getLoggedInUser().then(r => console.log(r.username));
+        dom.initHeader();
         dom.initLoginForm();
         dom.initRegistrationForm();
         dom.initInputClose();
@@ -88,6 +88,7 @@ export let dom = {
             dom.showBoards(boards);
             dom.showDefaultStatuses(defaultStatuses);
             dom.showCards(cards);
+            dom.initHeader();
             dom.setDefaultFocusTarget();
             dom.initCollapseBoard();
             dom.initAddNewColumnListeners()
@@ -494,7 +495,23 @@ export let dom = {
         },
 
         initHeader: function() {
-            dataHandler.getLoggedInUser().then(data => );
+            dataHandler.getLoggedInUser().then(function(data) {
+                if (data.username == "") {
+                    document.getElementById("login").style.visibility = "visible";
+                    document.getElementById("sign-up").style.visibility = "visible";
+                    document.getElementById("logout").style.visibility = "hidden";
+                    document.getElementById("user-display").style.visibility = "hidden";
+                    document.getElementById("add_private_board").style.visibility = "hidden";
+                }
+                else {
+                    document.getElementById("login").style.visibility = "hidden";
+                    document.getElementById("sign-up").style.visibility = "hidden";
+                    document.getElementById("logout").style.visibility = "visible";
+                    document.getElementById("user-display").style.visibility = "visible";
+                    document.getElementById("user-display").innerHTML = data.username;
+                    document.getElementById("add_private_board").style.visibility = "visible";
+                }
+            })
         }
 };
 
