@@ -36,6 +36,7 @@ export let dom = {
         dom.showModal();
         dom.createModal('column')
         let columnArea = evt.currentTarget.closest('section').querySelector(".board-columns");
+        document.querySelector('#saveChanges').innerHTML = "Add column"
         document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title');
             dataHandler.newStatus({"title": customTitle.value, "board_id": boardID})
@@ -106,13 +107,15 @@ export let dom = {
             let defaultStatuses = data[1]
             let cards = data[2]
             let customStatuses = data[3]
+            let loggedInUser = data[4]
             dom.showBoards(boards);
             dom.showDefaultStatuses(defaultStatuses);
             dom.showCustomStatuses(customStatuses)
             dom.showCards(cards);
             dom.initHeader();
             dom.initCollapseBoard();
-            dom.initAddNewColumnListeners()
+            dom.initBoardTitleListeners();
+            dom.initAddNewColumnListeners();
             dom.initCardEventListeners();
             dom.initDragAndDrop();
             dom.setupAddNewCardsBTN();
@@ -122,7 +125,15 @@ export let dom = {
         })
 
     },
-
+    initBoardTitleListeners: function (){
+        let boardTitles = document.querySelectorAll('.board-title');
+        for(let title of boardTitles){
+            title.addEventListener('click', dom.showBoardTitleInput)
+            let inputField = title.querySelector('input')
+            inputField.addEventListener('keydown', dom.initBoardTitleChange)
+            inputField.addEventListener('mouseleave', dom.closeInputBoard)
+        }
+    },
     showBoards: function (boards) {
         let boardsContainer = document.querySelector('#boards');
         boardsContainer.classList.remove('center-content');
@@ -138,7 +149,8 @@ export let dom = {
             boardsContainer.insertAdjacentHTML('beforeend', `
             <section id="board-id-${board['id']}" class="board ${addPrivateClass}" data-board-id="${board['id']}">
                 <div class="board-header">
-                    <span data-board-title="${board.title}" class="board-title">${board['title']}</span>
+                    <span data-board-title="${board.title}" class="board-title">
+                        <input value="${board.title}" class="board-title-change hide-element">${board['title']}</span>
                     <span class="flex-grow-max"></span>
                     <button data-button-functionality="delete-board" class="button-pure">
                         <i class="board-delete fas fa-trash-alt"></i>
@@ -151,12 +163,8 @@ export let dom = {
             </section>
             ` );
             let section = document.querySelector(`#board-id-${board['id']}`);
-            section.querySelector(`[data-board-title="${board.title}"]`).addEventListener('click', this.changeBoardName)
             section.querySelector(".board-delete").addEventListener('click', dom.deleteBoard)
         }
-    },
-    changeBoardName: function (evt){
-        dom.modalBoardNameChange(evt)
     },
 
     closeModal: function (){
@@ -164,28 +172,6 @@ export let dom = {
     },
     showModal: function() {
         document.querySelector(".bg-modal").style.display = "block";
-    },
-    saveBoardNameChange: function (){
-        let newBoardName = document.querySelector('.modalInput').value;
-        let boardID = document.querySelector('.modalInput').id;
-        dataHandler.updateBoardTitle({"board_name": newBoardName, "id": boardID})
-            .then(() => document.querySelector(
-                `#board-id-${boardID} span`).innerHTML = newBoardName)
-            .then(() => document.querySelector('.bg-modal').style.display = 'none')
-    },
-
-    modalBoardNameChange: function (evt){
-        document.querySelector('.modal-content').innerHTML = '';
-        let parentSection = evt.target.parentNode.parentNode;
-        let boardID = parentSection.getAttribute('data-board-id');
-        let boardName = evt.target.dataset.boardTitle;
-        document.querySelector('.bg-modal').style.display = "block";
-        document.querySelector('.modal-content').insertAdjacentHTML(
-            'beforeend',
-            `<h2>Change board name</h2>
-                  <input id="${boardID}" class="modalInput" value="${boardName}">`)
-        document.querySelector('#saveChanges').addEventListener('click', this.saveBoardNameChange)
-
     },
 
     showDefaultStatuses: function (defaultStatuses) {
@@ -280,16 +266,24 @@ export let dom = {
         let inputFields = document.querySelectorAll('.card-title-change');
         for(let card of cards){
             card.addEventListener('click', dom.showCardTitleInput);
-            card.addEventListener('mouseleave', dom.closeInput)
+            card.addEventListener('mouseleave', dom.closeInput);
         }
         for(let field of inputFields){
-            field.addEventListener('keydown', dom.initTitleChange);
+            field.addEventListener('keydown', dom.initCardTitleChange);
         }
         for(let cardDeleteButton of cardDeleteButtons){
             cardDeleteButton.addEventListener('click', dom.deleteCard);
         }
     },
-
+    closeInputBoard: function (evt){
+        let inputField = evt.target;
+        let boardID = inputField.closest('section').dataset.boardId;
+        if(!inputField.classList.contains('hide-element')){
+            inputField.classList.add('hide-element');
+            dataHandler.getBoard({'board_id': boardID})
+                .then((response) => inputField.after(response['title']))
+        }
+    },
     closeInput: function (evt){
         let inputField = evt.target.querySelector('input');
         let cardID = inputField.closest('.card').dataset.cardId;
@@ -312,6 +306,19 @@ export let dom = {
         dataHandler.removeCard(cardId)
             .then(() => card.remove())
     },
+
+    showBoardTitleInput: function (evt){
+        let board = evt.target.closest('section');
+        let inputField = board.querySelector('input')
+        if(inputField.classList.contains('hide-element')){
+            let title = inputField.closest('.board-title');
+            let boardNameNode = title.childNodes[2];
+            title.removeChild(boardNameNode);
+            title.childNodes[1].classList.remove('hide-element');
+            title.childNodes[1].classList.add('display-flex-element');
+        }
+    },
+
     initStatusDeleteBTN: function (){
         let statusDeleteButtons = document.querySelectorAll('.column-delete.fa-trash-alt');
         for(let statusDeleteButton of statusDeleteButtons){
@@ -334,11 +341,10 @@ export let dom = {
         titleDiv.childNodes[2].textContent = '';
         titleDiv.childNodes[1].classList.remove('hide-element');
         titleDiv.childNodes[1].classList.add('display-flex-element');
-        dom.focusTarget = titleDiv.closest('.card');
     },
 
     discardTitleChange: function (target){
-        let cardID = dom.focusTarget.dataset.cardId;
+        let cardID = target.closest('.card').dataset.boardId;
         target.closest('.card-title').childNodes[2].textContent = '';
         target.classList.remove('display-flex-element');
         target.classList.add('hide-element');
@@ -374,6 +380,18 @@ export let dom = {
             return item.getAttribute('id').match(/[0-9]+/)[0]
         })
     },
+
+    saveBoardTitleChange: function (evt, titleInput){
+        let newTitle = evt.currentTarget.value;
+        let boardID = titleInput.closest('section').dataset.boardId;
+        let titleDiv = titleInput.closest('.board-title');
+        dataHandler.updateBoardTitle({"board_name": newTitle, "id": boardID})
+            .then(() => titleInput.value = newTitle)
+            .then(() => titleInput.after(newTitle))
+            .then(() => titleInput.classList.add('hide-element'))
+            .then(() => titleInput.classList.remove('display-flex-element'))
+    },
+
     saveTitleChange: function (evt, titleInput) {
         let newTitle = evt.currentTarget.value;
         let cardID = titleInput.closest("[data-card-id]").dataset.cardId;
@@ -384,7 +402,16 @@ export let dom = {
             .then(() => titleInput.classList.remove('display-flex-element'))
     },
 
-    initTitleChange: function (evt){
+    initBoardTitleChange: function(evt){
+        let titleInput = evt.currentTarget;
+        if(evt.key === 'Enter'){
+            dom.saveBoardTitleChange(evt, titleInput);
+        } else if(evt.key === 'Escape'){
+            dom.discardTitleChange(titleInput)
+        }
+    },
+
+    initCardTitleChange: function (evt){
         let titleInput = evt.currentTarget;
         if(evt.key === 'Enter'){
             dom.saveTitleChange(evt, titleInput);
@@ -397,6 +424,7 @@ export let dom = {
      initNewBoardCreate: function(event){
         dom.showModal()
         dom.createModal("Board")
+        document.querySelector('#saveChanges').innerHTML = "Add board"
         document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title')
             if (event.target.id === "add_public_board") {
@@ -437,6 +465,7 @@ export let dom = {
             let statusId =  0;
             dom.showModal()
             dom.createModal("Card")
+            document.querySelector('#saveChanges').innerHTML = "Add card"
             document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title')
                 dom.addNewCardToBoard(customTitle.value, cardContainers);
@@ -482,6 +511,7 @@ export let dom = {
         },
 
         initRegistrationDataSubmit: function() {
+            document.querySelector('#saveChanges').innerHTML = "Submit"
             document.querySelector('#saveChanges').onclick = function() {
                 dom.postDataFromRegistrationForm();
             }
@@ -490,8 +520,10 @@ export let dom = {
         postDataFromRegistrationForm: function() {
             let new_username = document.getElementById("new_username").value
             let new_password = document.getElementById("new_password").value
-            dom.closeModal()
-            dataHandler.createNewUser(new_username, new_password).then(dom.loadBoards)
+            if (new_username.length > 0 && new_password.length > 0) {
+                dom.closeModal()
+                dataHandler.createNewUser(new_username, new_password).then(dom.loadBoards)
+            }
         },
 
         showLoginForm: function() {
@@ -514,6 +546,7 @@ export let dom = {
         },
 
         initLoginDataSubmit: function() {
+            document.querySelector('#saveChanges').innerHTML = "Login"
             document.querySelector('#saveChanges').onclick = function() {
                 dom.postDataFromLoginForm();
             }
@@ -522,8 +555,10 @@ export let dom = {
         postDataFromLoginForm: function() {
             let username = document.getElementById("username").value
             let password = document.getElementById("password").value
-            dom.closeModal()
-            dataHandler.postLoginData(username, password).then(dom.loadBoards)
+            if (username.length > 0 && password.length > 0) {
+                dom.closeModal()
+                dataHandler.postLoginData(username, password).then(dom.loadBoards)
+            }
         },
 
         initHeader: function() {
@@ -540,6 +575,7 @@ export let dom = {
                     document.getElementById("logout").classList.remove('hide-element');
                     document.getElementById("user-display").classList.remove('hide-element');
                     document.getElementById("add_private_board").classList.remove('hide-element');
+                    document.getElementById("user-display").innerHTML = data.username
                 }
             })
         },
@@ -603,6 +639,9 @@ export let dom = {
                                     <input value="${cardData.title}" class="card-title-change hide-element">${cardData.title}
                                 </div>
                             </>`)
+                            dom.initCardEventListeners();
+                               dom.initDragAndDrop();
+                               dom.setArchiveListener();
                             card.remove();})
                                                 })
                     })

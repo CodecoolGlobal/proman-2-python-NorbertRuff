@@ -119,6 +119,17 @@ def get_boards(cursor, username):
 
 
 @connection.connection_handler
+def get_board(cursor, board_id):
+    query = """
+           SELECT title FROM boards WHERE id = %(board_id)s
+            """
+    var = {'board_id': board_id}
+    cursor.execute(query, var)
+    return cursor.fetchone()
+
+
+
+@connection.connection_handler
 def save_new_board(cursor, json_data):
     query = """
             INSERT INTO boards values (DEFAULT, %(data)s, NULL);

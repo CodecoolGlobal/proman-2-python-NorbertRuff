@@ -221,8 +221,10 @@ section.board-private {
     padding: 2px 16px 2px 2px;
     border-width: 2px;
 }
-
-.card-title>input {
+.board-title>input{
+    font-size: 20px;
+}
+.card-title>input{
     width:100%;
     box-sizing:border-box;
     -moz-box-sizing:border-box;
