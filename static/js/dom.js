@@ -120,7 +120,8 @@ export let dom = {
 
     showBoards: function (boards) {
         let boardsContainer = document.querySelector('#boards');
-        boardsContainer.innerHTML = ''
+        boardsContainer.classList.remove('center-content');
+        boardsContainer.innerHTML = '';
         boardsContainer.classList.add('board-container')
         for (let board of boards){
             let addPrivateClass
