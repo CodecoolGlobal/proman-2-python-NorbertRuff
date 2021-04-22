@@ -99,6 +99,9 @@ section.board-private {
     display: inline-block;
 }
 
+.column-delete{
+    padding: 0 10px;
+}
 
 .board-toggle{
     margin: 10px 2px 10px 2px;
