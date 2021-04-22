@@ -48,6 +48,41 @@ def add_new_status(cursor, title):
 
 
 @connection.connection_handler
+def add_custom_status(cursor, board_id, status_id):
+    """Add new statuses ID to custom statuses and return it"""
+    query = """
+        INSERT INTO custom_board_statuses (board_id,status_id) VALUES (%(board_id)s, %(status_id)s)
+        """
+    var = {"board_id": board_id, "status_id": status_id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
+def get_public_boards_custom_statuses(cursor):
+    query = """
+        SELECT board_id, status_id, s.title FROM custom_board_statuses
+        JOIN statuses s on custom_board_statuses.status_id = s.id
+        JOIN boards b on custom_board_statuses.board_id = b.id
+        where user_id is null
+    """
+    cursor.execute(query)
+    return cursor.fetchall()
+
+
+@connection.connection_handler
+def get_board_custom_statuses(cursor, user_id):
+    query = """
+        SELECT board_id, status_id, s.title FROM custom_board_statuses
+        JOIN statuses s on custom_board_statuses.status_id = s.id
+        JOIN boards b on custom_board_statuses.board_id = b.id
+        where user_id is null or user_id = %(user_id)s
+    """
+    var = {"user_id": user_id}
+    cursor.execute(query, var)
+    return cursor.fetchall()
+
+
+@connection.connection_handler
 def update_card_title(cursor, new_name, id):
     query = """
         UPDATE cards 
@@ -56,6 +91,16 @@ def update_card_title(cursor, new_name, id):
     """
     var = {'title': new_name, 'id': id}
     cursor.execute(query, var)
+
+
+@connection.connection_handler
+def get_user_id(cursor, username):
+    query = """
+            SELECT id FROM users WHERE name = %(username)s
+            """
+    var = {'username': username}
+    cursor.execute(query, var)
+    return cursor.fetchone()
 
 
 @connection.connection_handler
