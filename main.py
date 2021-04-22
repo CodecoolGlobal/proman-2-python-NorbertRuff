@@ -119,6 +119,13 @@ def archive_card():
         return jsonify({"response": "There was an error during execution of your request"})
 
 
+@app.route("/get-archived-cards")
+@json_response
+def get_archived_cards():
+    username = session.get('username', 'test@password.com')
+    return data_handler.get_archived_cards(username)
+
+
 def main():
     app.run(debug=True)
 

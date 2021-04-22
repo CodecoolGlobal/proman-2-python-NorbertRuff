@@ -85,15 +85,24 @@ export let dataHandler = {
     })
     },
 
-    updateCards: function (data){
+    updateCards: function (data) {
         this._api_post('/update-cards', data, () => {
         });
     },
 
-    archiveCard: function (data){
+    archiveCard: function (data) {
         this._api_post('/archive-card', data, () => {
-        // add modal with notification 
+        // add modal with notification
         });
+    },
+
+    getArchivedCards: function () {
+        return new Promise ((resolve, reject) => {
+            this._api_get('/get-archived-cards', (response) => {
+            this._data['archived-cards'] = response;
+            resolve(response)
+            });
+        })
     },
 
     newStatus: function (data) {

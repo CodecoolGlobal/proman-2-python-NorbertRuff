@@ -87,6 +87,7 @@ export let dom = {
             dom.initDragAndDrop();
             dom.setupAddNewCardsBTN();
             dom.setArchiveListener();
+            dom.initArchivedCardsButton();
         })
 
     },
@@ -167,7 +168,7 @@ export let dom = {
            column.insertAdjacentHTML('beforeend',
                `<div id="card-id-${card['id']}" data-card-id="${card.id}" class="card" draggable="true">
                     <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
-                    <div class="card-archive"><i class="fa fa-file-archive"></i></div>
+                    <div class="card-archive"><i class="fa fa-cloud"></i></div>
                     <div class="card-title">
                         <input value="${card.title}" class="card-title-change hide-element">${card.title}
                     </div>
@@ -382,6 +383,36 @@ export let dom = {
                     dataHandler.archiveCard({'card_id': cardID })
                     card.remove();
                 })
+            })
+        },
+
+        initArchivedCardsButton: () => {
+            let archivedCardsButton = document.querySelector("#archived_cards");
+            archivedCardsButton.addEventListener('click', dom.showArchivedMessages);
+        },
+
+        showArchivedMessages: () => {
+            dom.showModal()
+            dom.createArchivedCardsModal()
+            document.querySelector('#saveChanges').onclick = function() {
+                console.log('archived cards')
+                dom.closeModal()
+            }
+        },
+
+        createArchivedCardsModal: function(){
+            let modalContent = document.querySelector('.modal-content')
+            modalContent.innerHTML = '<h2>Archived cards</h2>';
+            dataHandler.getArchivedCards()
+                .then((cards) => {
+                    for (let card of cards) {
+                        modalContent.insertAdjacentHTML('beforeend', `
+                       <div id="card-id-${card['id']}" data-card-id="${card.id}" class="card">
+                        <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
+                        <div class="card-archive"><i class="fa fa-history"></i></div>
+                        <div class="card-title">${card.title}</div>
+                        </div>
+            `   )}
             })
         },
 };
