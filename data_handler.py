@@ -128,13 +128,21 @@ def save_new_board(cursor, json_data):
 
 
 @connection.connection_handler
+def save_new_private_board(cursor, board_title, board_user_id):
+    query = """
+            INSERT INTO boards values (DEFAULT, %(board_title)s, %(board_user_id)s);
+            """
+    var = {'board_title': board_title, 'board_user_id': board_user_id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
 def save_new_card(cursor, board_id, title, status_id, cards_order, archived):
     query = """
             INSERT INTO cards values (DEFAULT, %(data1)s, %(data2)s, %(data3)s, %(data4)s, %(data5)s);
             """
     var = {'data1': board_id, 'data2': title, 'data3': status_id, 'data4': cards_order, 'data5': archived}
     cursor.execute(query, var)
-
 
 
 @connection.connection_handler
@@ -173,6 +181,30 @@ def update_card_data(cursor, card_id, board_id, status_id):
         WHERE id = %(card_id)s;
         """
     var = {'card_id': card_id, 'board_id': board_id, 'status_id': status_id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
+def remove_card(cursor, card_id):
+    query = """
+        DELETE FROM cards
+        WHERE id = %(card_id)s;
+        """
+    var = {'card_id': card_id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
+def remove_board(cursor, board_id):
+    query = """
+        DELETE FROM cards
+        WHERE board_id = %(board_id)s;
+        DELETE FROM custom_board_statuses
+        WHERE board_id = %(board_id)s; 
+        DELETE FROM boards
+        WHERE id = %(board_id)s;
+        """
+    var = {'board_id': board_id}
     cursor.execute(query, var)
 
 

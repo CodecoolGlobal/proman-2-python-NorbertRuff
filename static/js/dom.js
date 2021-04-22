@@ -5,15 +5,20 @@ export let dom = {
     focusTarget: '',
     // This function should run once, when the page is loaded.
     init: function () {
-        dom.initNewPublicBoardButton();
+        dom.initNewBoardButtons();
         dom.initInputClose();
         dom.initModalClose();
     },
 
-    initNewPublicBoardButton: function () {
-        let addNewPublicBoardBTN = document.querySelector("#add_public_board");
-        addNewPublicBoardBTN.addEventListener('click', dom.initNewBoardCreate);
+    initNewBoardButtons: function () {
+        let addNewPublicBoardButton = document.querySelector("#add_public_board");
+        addNewPublicBoardButton.addEventListener('click', dom.initNewBoardCreate);
+
+        // TODO ide kell még egy feltétel, hogy ez a button csak akkor látszódjon, ha van belogolt user
+        let addNewPrivateBoardButton = document.querySelector("#add_private_board");
+        addNewPrivateBoardButton.addEventListener('click', dom.initNewBoardCreate);
     },
+
 
     initModalClose: function (){
         document.querySelector('.close').addEventListener('click', this.closeModal)
@@ -118,6 +123,9 @@ export let dom = {
                 <div class="board-header">
                     <span data-board-title="${board.title}" class="board-title">${board['title']}</span>
                     <span class="flex-grow-max"></span>
+                    <button data-button-functionality="delete-board" class="button-pure">
+                        <i class="board-delete fas fa-trash-alt"></i>
+                    </button>
                     <button data-button-functionality="card" class="card-add">Add Card</button>
                     <button data-button-functionality="column" class="board-add">Add Column</button>
                     <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
@@ -127,6 +135,7 @@ export let dom = {
             ` );
             let section = document.querySelector(`#board-id-${board['id']}`);
             section.querySelector(`[data-board-title="${board.title}"]`).addEventListener('click', this.changeBoardName)
+            section.querySelector(".board-delete").addEventListener('click', dom.deleteBoard)
         }
     },
     changeBoardName: function (evt){
@@ -183,7 +192,7 @@ export let dom = {
            let column = board.querySelector(`#status-id-${card.status_id}`)
            column.insertAdjacentHTML('beforeend',
                `<div id="card-id-${card['id']}" data-card-id="${card.id}" class="card" draggable="true">
-                    <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
+                    <div class="card-remove"><i class="card-delete fas fa-trash-alt"></i></div>
                     <div class="card-title">
                         <input value="${card.title}" class="card-title-change hide-element">${card.title}
                     </div>
@@ -209,6 +218,8 @@ export let dom = {
         addCol.classList.toggle('hide-element')
         let addCard = event.currentTarget.closest('.board-header').querySelector('[data-button-functionality="card"]');
         addCard.classList.toggle('hide-element')
+        let delBoard = event.currentTarget.closest('.board-header').querySelector('[data-button-functionality="delete-board"]');
+        delBoard.classList.toggle('hide-element')
     },
 
     initDragAndDrop: () => {
@@ -247,6 +258,7 @@ export let dom = {
 
     initCardEventListeners: function(){
         let cards = document.querySelectorAll('.card');
+        let cardDeleteButtons = document.querySelectorAll('.card-delete.fa-trash-alt');
         let inputFields = document.querySelectorAll('.card-title-change');
         for(let card of cards){
             card.addEventListener('click', dom.showCardTitleInput)
@@ -254,8 +266,22 @@ export let dom = {
         for(let field of inputFields){
             field.addEventListener('keydown', dom.initTitleChange)
         }
+        for(let cardDeleteButton of cardDeleteButtons){
+            cardDeleteButton.addEventListener('click', dom.deleteCard)
+        }
     },
-
+    deleteBoard: function(event){
+        let board = event.target.closest("section");
+        let boardId = board.dataset.boardId;
+        dataHandler.removeBoard(boardId)
+            .then(() => board.remove())
+    },
+    deleteCard: function(event){
+        let card = event.target.parentElement.parentElement
+        let cardId = card.dataset.cardId;
+        dataHandler.removeCard(cardId)
+            .then(() => card.remove())
+    },
     showCardTitleInput: function (evt){
         let titleDiv = evt.currentTarget.querySelector('.card-title');
         titleDiv.childNodes[2].textContent = '';
@@ -322,14 +348,20 @@ export let dom = {
     },
 
     // Main function for setting up, creating, saving new board
-     initNewBoardCreate: function(){
+     initNewBoardCreate: function(event){
         dom.showModal()
         dom.createModal("Board")
         document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title')
-            dom.createNewPBoard(customTitle.value);
-            dataHandler.createNewBoard(customTitle.value)
-            .then(dom.loadBoards);
+            console.log(event.target.id)
+            if (event.target.id === "add_public_board") {
+                dataHandler.createNewPublicBoard(customTitle.value)
+                .then(dom.loadBoards);
+            }
+            else if (event.target.id === "add_private_board") {
+                dataHandler.createNewPrivateBoard(customTitle.value)
+                .then(dom.loadBoards);
+            }
             dom.closeModal()
             }
         },
@@ -345,7 +377,7 @@ export let dom = {
         },
 
         // Creates new public board with title adds after last board
-         createNewPBoard: function(customTitle) {
+         createNewPublicBoard: function(customTitle) {
             let boards = document.querySelectorAll('section');
             let lastBoard = document.querySelector('section:last-child');
             lastBoard.insertAdjacentHTML('afterend', `
@@ -358,6 +390,22 @@ export let dom = {
                         </section>
                     `);
         },
+
+        // Creates new private board with title adds after last board
+         createNewPrivateBoard: function(customTitle) {
+            let boards = document.querySelectorAll('section');
+            let lastBoard = document.querySelector('section:last-child');
+            lastBoard.insertAdjacentHTML('afterend', `
+                        <section id="board-id-${boards.length + 1}" class="board private-board" data-board-id="${boards.length + 1}">
+                            <div class="board-header"><span class="board-title">${customTitle}</span>
+                                <button class="card-add">Add Card</button>
+                                <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
+                            </div>
+                            <div class="board-columns"></div>
+                        </section>
+                    `);
+        },
+
         setupAddNewCardsBTN: function(){
             let addCardButtons = document.getElementsByClassName("card-add");
             for (let addCardButton of addCardButtons) {

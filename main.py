@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, session, request, jsonify
+from flask import Flask, render_template, redirect, url_for, session, request, jsonify
 from util import json_response
 
 import data_handler
@@ -56,6 +56,26 @@ def update_card_title():
         return jsonify({"response": "There was an error during execution of your request"})
 
 
+@app.route("/remove-card", methods=["POST"])
+def remove_card():
+    card_id = request.get_json()
+    try:
+        data_handler.remove_card(card_id)
+        return jsonify({"response": "OK"})
+    except:
+        return jsonify({"response": "There was an error during execution of your request"})
+
+
+@app.route("/remove-board", methods=["POST"])
+def remove_board():
+    board_id = request.get_json()
+    try:
+        data_handler.remove_board(board_id)
+        return jsonify({"response": "OK"})
+    except:
+        return jsonify({"response": "There was an error during execution of your request"})
+
+
 @app.route("/update-board-title", methods=["POST"])
 def update_board_title():
     new_name = request.get_json()['board_name']
@@ -97,7 +117,21 @@ def get_all_cards():
 @json_response
 def save_new_board():
     json_data = request.get_json()
+    print(json_data)
     data_handler.save_new_board(json_data)
+
+
+@app.route("/create-private-board", methods=['POST'])
+def save_new_private_board():
+    # TODO "and 'username' in session" in the below if statement, once we have sessions
+    if request.method == 'POST':
+        board_title = request.get_json()
+        board_user_id = session.get('username')
+        print(board_title, board_user_id)
+        data_handler.save_new_private_board(board_title, board_user_id)
+        return jsonify({"response": "OK"})
+    else:
+        return redirect(url_for('index'))
 
 
 @app.route("/create-card", methods=['POST'])
@@ -110,7 +144,6 @@ def create_card():
     archived = request.get_json()['archived']
     data_handler.save_new_card(board_id, title, status_id, cards_order, archived)
     return ""
-
 
 
 @app.route("/update-cards", methods=["POST"])
