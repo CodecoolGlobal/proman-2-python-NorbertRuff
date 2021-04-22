@@ -8,6 +8,10 @@
     --status-3-contrast: #4d525c;
     --status-4: #046582;
     --status-4-contrast: #034254;
+    --status-5: #0f7a75;
+    --status-5-contrast: #0b5e5a;
+    --status-6: #248048;
+    --status-6-contrast: #1d693a;
 }
 
 html {
@@ -40,6 +44,11 @@ h3 {
     font-size: 2em;
     letter-spacing: 5px;
     /*transform: scale(1.2, 1);*/
+}
+
+.center-content {
+    text-align: center;
+    color: #ababab;
 }
 
 button{
@@ -99,6 +108,10 @@ section.board-private {
     display: inline-block;
 }
 
+.column-delete{
+    padding: 0 10px;
+    cursor: pointer;
+}
 
 .board-toggle{
     margin: 10px 2px 10px 2px;
@@ -113,7 +126,7 @@ section.board-private {
 }
 
 .board-column{
-    padding: 16px;
+    padding: 10px;
     flex: 1;
 }
 
@@ -139,7 +152,7 @@ section.board-private {
     background: #222;
     color: #fff;
     border-radius: var(--border-radius);
-    margin: 4px 0;
+    margin: 8px 0;
     padding: 10px;
     cursor: pointer;
 }
@@ -172,6 +185,18 @@ section.board-private {
     background: var(--status-4);
     border: 1px solid var(--status-4-contrast);
     box-shadow: 2px 2px var(--status-4-contrast);
+}
+
+.board-column:nth-of-type(5) .card{
+    background: var(--status-5);
+    border: 1px solid var(--status-5-contrast);
+    box-shadow: 2px 2px var(--status-5-contrast);
+}
+
+.board-column:nth-of-type(6) .card{
+    background: var(--status-6);
+    border: 1px solid var(--status-6-contrast);
+    box-shadow: 2px 2px var(--status-6-contrast);
 }
 
 .card-remove{
@@ -233,9 +258,24 @@ section.board-private {
     /*box-shadow: 5px 5px #cccccc;*/
 }
 
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .modalInput {
     padding: 4px;
 }
+
+/*this is for the archived cards that are inside the modal*/
+.modal .card {
+    background: black;
+    border: 1px solid #2e2e2e;
+    box-shadow: 2px 2px #2e2e2e;
+    width: 220px;
+}
+
 /*--------------------------modal-----------------------------*/
 
 .close {

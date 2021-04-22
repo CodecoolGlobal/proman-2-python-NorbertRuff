@@ -148,6 +148,18 @@ def save_new_private_board(cursor, board_title, board_user_id):
 
 
 @connection.connection_handler
+def remove_status(cursor, status__id):
+    query = """
+        DELETE FROM custom_board_statuses
+        WHERE status_id = %(status__id)s;
+        DELETE FROM statuses
+        WHERE id = %(status__id)s;
+        """
+    var = {'status__id': status__id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
 def save_new_card(cursor, board_id, title, status_id, cards_order, archived):
     query = """
             INSERT INTO cards values (DEFAULT, %(data1)s, %(data2)s, %(data3)s, %(data4)s, %(data5)s);

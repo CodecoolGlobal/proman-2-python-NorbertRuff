@@ -36,6 +36,7 @@ export let dom = {
         dom.showModal();
         dom.createModal('column')
         let columnArea = evt.currentTarget.closest('section').querySelector(".board-columns");
+        document.querySelector('#saveChanges').innerHTML = "Add column"
         document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title');
             dataHandler.newStatus({"title": customTitle.value, "board_id": boardID})
@@ -43,10 +44,13 @@ export let dom = {
                     columnArea.insertAdjacentHTML(
                         'beforeend', `
                 <div class="board-column">
-                <div class="board-column-title">${response.title}</div>
+                <div class="board-column-title">${response.title}<i class="column-delete fas fa-trash-alt"></i></div>
                 <div id="status-id-${response.id}" class="board-column-content" data-status-id="${response.id}"></div>
                 </div>`))
-                .then(() => dom.checkColumnCount(boardID))
+                .then(() => {
+                    dom.checkColumnCount(boardID);
+                    dom.loadBoards();
+                })
             dom.closeModal()
         }
     },
@@ -60,6 +64,7 @@ export let dom = {
         } else{
             dom.enableAddNewColumnBtn(addNewColBtn)
         }
+        dom.initStatusDeleteBTN();
     },
 
     enableAddNewColumnBtn: function (addNewColBtn){
@@ -81,7 +86,7 @@ export let dom = {
                     if(status['board_id'] === parseInt(boardID)){
                         columnContent.insertAdjacentHTML('beforeend', `
                         <div class="board-column">
-                        <div class="board-column-title">${status['title']}</div>
+                        <div class="board-column-title">${status['title']}`+ (status['status_id'] > 3 ? '<i class="column-delete fas fa-trash-alt"></i>': "") + `</div>
                         <div id="status-id-${status['status_id']}" class="board-column-content" data-status-id="${status['status_id']}"></div>
                         </div>`)
                     }
@@ -102,6 +107,7 @@ export let dom = {
             let defaultStatuses = data[1]
             let cards = data[2]
             let customStatuses = data[3]
+            let loggedInUser = data[4]
             dom.showBoards(boards);
             dom.showDefaultStatuses(defaultStatuses);
             dom.showCustomStatuses(customStatuses)
@@ -115,6 +121,7 @@ export let dom = {
             dom.setupAddNewCardsBTN();
             dom.setArchiveListener();
             dom.initArchivedCardsButton();
+            dom.initStatusDeleteBTN();
         })
 
     },
@@ -129,7 +136,8 @@ export let dom = {
     },
     showBoards: function (boards) {
         let boardsContainer = document.querySelector('#boards');
-        boardsContainer.innerHTML = ''
+        boardsContainer.classList.remove('center-content');
+        boardsContainer.innerHTML = '';
         boardsContainer.classList.add('board-container')
         for (let board of boards){
             let addPrivateClass
@@ -196,7 +204,7 @@ export let dom = {
        }
     },
 
-       initCollapseBoard: () => {
+    initCollapseBoard: () => {
         let toggleButtons = document.querySelectorAll(".board-toggle");
         for (let button of toggleButtons) {
             button.firstChild.classList.remove('fa-chevron-down') // set default to up button
@@ -311,6 +319,23 @@ export let dom = {
         }
     },
 
+    initStatusDeleteBTN: function (){
+        let statusDeleteButtons = document.querySelectorAll('.column-delete.fa-trash-alt');
+        for(let statusDeleteButton of statusDeleteButtons){
+            statusDeleteButton.addEventListener('click', dom.deleteStatus)
+        }
+    },
+    deleteStatus: function(event){
+        let cards = event.target.parentElement.parentElement.querySelector('.board-column-content')
+        for (let card of cards.childNodes){
+            let cardId = card.dataset.cardId
+            dataHandler.removeCard(cardId)
+                .then(() => card.remove())
+        }
+        dataHandler.removeStatus(cards.dataset.statusId)
+            .then(() => event.target.closest('.board-column').remove())
+        dom.checkColumnCount(event.target.closest("section").dataset.boardId)
+    },
     showCardTitleInput: function (evt){
         let titleDiv = evt.currentTarget.querySelector('.card-title');
         titleDiv.childNodes[2].textContent = '';
@@ -399,6 +424,7 @@ export let dom = {
      initNewBoardCreate: function(event){
         dom.showModal()
         dom.createModal("Board")
+        document.querySelector('#saveChanges').innerHTML = "Add board"
         document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title')
             if (event.target.id === "add_public_board") {
@@ -423,35 +449,6 @@ export let dom = {
             `);
         },
 
-        // Creates new public board with title adds after last board
-         createNewPublicBoard: function(customTitle) {
-            let boards = document.querySelectorAll('section');
-            let lastBoard = document.querySelector('section:last-child');
-            lastBoard.insertAdjacentHTML('afterend', `
-                        <section id="board-id-${boards.length + 1}" class="board" data-board-id="${boards.length + 1}">
-                            <div class="board-header"><span class="board-title">${customTitle}</span>
-                                <button class="card-add">Add Card</button>
-                                <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
-                            </div>
-                            <div class="board-columns"></div>
-                        </section>
-                    `);
-        },
-
-        // Creates new private board with title adds after last board
-         createNewPrivateBoard: function(customTitle) {
-            let boards = document.querySelectorAll('section');
-            let lastBoard = document.querySelector('section:last-child');
-            lastBoard.insertAdjacentHTML('afterend', `
-                        <section id="board-id-${boards.length + 1}" class="board private-board" data-board-id="${boards.length + 1}">
-                            <div class="board-header"><span class="board-title">${customTitle}</span>
-                                <button class="card-add">Add Card</button>
-                                <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
-                            </div>
-                            <div class="board-columns"></div>
-                        </section>
-                    `);
-        },
 
         setupAddNewCardsBTN: function(){
             let addCardButtons = document.getElementsByClassName("card-add");
@@ -468,6 +465,7 @@ export let dom = {
             let statusId =  0;
             dom.showModal()
             dom.createModal("Card")
+            document.querySelector('#saveChanges').innerHTML = "Add card"
             document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title')
                 dom.addNewCardToBoard(customTitle.value, cardContainers);
@@ -513,6 +511,7 @@ export let dom = {
         },
 
         initRegistrationDataSubmit: function() {
+            document.querySelector('#saveChanges').innerHTML = "Submit"
             document.querySelector('#saveChanges').onclick = function() {
                 dom.postDataFromRegistrationForm();
             }
@@ -521,8 +520,10 @@ export let dom = {
         postDataFromRegistrationForm: function() {
             let new_username = document.getElementById("new_username").value
             let new_password = document.getElementById("new_password").value
-            dom.closeModal()
-            dataHandler.createNewUser(new_username, new_password).then(dom.loadBoards)
+            if (new_username.length > 0 && new_password.length > 0) {
+                dom.closeModal()
+                dataHandler.createNewUser(new_username, new_password).then(dom.loadBoards)
+            }
         },
 
         showLoginForm: function() {
@@ -545,6 +546,7 @@ export let dom = {
         },
 
         initLoginDataSubmit: function() {
+            document.querySelector('#saveChanges').innerHTML = "Login"
             document.querySelector('#saveChanges').onclick = function() {
                 dom.postDataFromLoginForm();
             }
@@ -553,8 +555,10 @@ export let dom = {
         postDataFromLoginForm: function() {
             let username = document.getElementById("username").value
             let password = document.getElementById("password").value
-            dom.closeModal()
-            dataHandler.postLoginData(username, password).then(dom.loadBoards)
+            if (username.length > 0 && password.length > 0) {
+                dom.closeModal()
+                dataHandler.postLoginData(username, password).then(dom.loadBoards)
+            }
         },
 
         initHeader: function() {
@@ -571,6 +575,7 @@ export let dom = {
                     document.getElementById("logout").classList.remove('hide-element');
                     document.getElementById("user-display").classList.remove('hide-element');
                     document.getElementById("add_private_board").classList.remove('hide-element');
+                    document.getElementById("user-display").innerHTML = data.username
                 }
             })
         },
