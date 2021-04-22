@@ -153,7 +153,7 @@ section.board{
     cursor: pointer;
 }
 
-.card-archive{
+.card-archive, .card-restore{
     display: block;
     position: absolute;
     top: 22px;

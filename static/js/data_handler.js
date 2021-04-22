@@ -105,6 +105,11 @@ export let dataHandler = {
         })
     },
 
+    restoreCard: function (data) {
+        this._api_post('/restore-card', data, () => {
+        });
+    },
+
     newStatus: function (data) {
         return new Promise ((resolve, reject) => {
             this._api_post('/new-status', data,(response) => {

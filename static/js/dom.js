@@ -395,8 +395,12 @@ export let dom = {
             dom.showModal()
             dom.createArchivedCardsModal()
             document.querySelector('#saveChanges').onclick = function() {
-                console.log('archived cards')
                 dom.closeModal()
+                location.reload()
+            }
+            document.querySelector('#close').onclick = function() {
+                dom.closeModal()
+                location.reload()
             }
         },
 
@@ -409,11 +413,20 @@ export let dom = {
                         modalContent.insertAdjacentHTML('beforeend', `
                        <div id="card-id-${card['id']}" data-card-id="${card.id}" class="card">
                         <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
-                        <div class="card-archive"><i class="fa fa-history"></i></div>
+                        <div class="card-restore"><i class="fa fa-history"></i></div>
                         <div class="card-title">${card.title}</div>
-                        </div>
-            `   )}
-            })
+                        </div>`)
+                    }
+                    let restoreCardButtons = document.querySelectorAll(".card-restore")
+                    restoreCardButtons.forEach((item) => {
+                        item.addEventListener('click', () => {
+                        let card = item.closest(".card")
+                        let cardID = card.getAttribute('id').match(/[0-9]+/)[0]
+                        dataHandler.restoreCard({'card_id': cardID })
+                        card.remove();
+                        })
+                    })
+                })
         },
 };
 
