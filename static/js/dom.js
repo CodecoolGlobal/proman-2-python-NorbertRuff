@@ -2,11 +2,9 @@
 import { dataHandler } from "./data_handler.js";
 
 export let dom = {
-    focusTarget: '',
     // This function should run once, when the page is loaded.
     init: function () {
         dom.initNewBoardButtons();
-        dom.initInputClose();
         dom.initModalClose();
     },
 
@@ -24,27 +22,6 @@ export let dom = {
         document.querySelector('.close').addEventListener('click', this.closeModal)
     },
 
-    initInputClose: function (){
-        window.addEventListener('click', this.closeInputFields);
-    },
-
-    setDefaultFocusTarget: function (){
-        dom.focusTarget = document.querySelector('.card');
-    },
-
-    closeInputFields: function (evt){
-        let inputField = dom.focusTarget.querySelector('input');
-        if(!inputField.classList.contains('hide-element')){
-            let isTargetArea = evt.composedPath().includes(dom.focusTarget);
-            let cardID = dom.focusTarget.dataset.cardId;
-            if (!isTargetArea){
-                inputField.closest('.card-title').childNodes[2].textContent = '';
-                inputField.classList.toggle('hide-element');
-                dataHandler.getCardTitle({'card_id': cardID})
-                    .then((response) => inputField.after(response['title']))
-            }
-        }
-    },
     initAddNewColumnListeners: function (){
             let addNewColButtons = document.querySelectorAll('[data-button-functionality="column"]');
             for (let button of addNewColButtons){
@@ -67,11 +44,33 @@ export let dom = {
                 <div class="board-column-title">${response.title}</div>
                 <div id="status-id-${response.id}" class="board-column-content" data-status-id="${response.id}"></div>
                 </div>`))
+                .then(() => dom.checkColumnCount(boardID))
             dom.closeModal()
         }
     },
+
+    checkColumnCount: function (boardID){
+        let section = document.querySelector(`[data-board-id="${boardID}"]`);
+        let columnCount = section.querySelector('.board-columns').children.length;
+        let addNewColBtn = section.querySelector('.board-add');
+        if(columnCount >= 6 && !addNewColBtn.disabled){
+            dom.disableAddNewColumnBtn(addNewColBtn)
+        } else{
+            dom.enableAddNewColumnBtn(addNewColBtn)
+        }
+    },
+
+    enableAddNewColumnBtn: function (addNewColBtn){
+        addNewColBtn.disabled = false;
+        addNewColBtn.style.filter = "none";
+    },
+
+    disableAddNewColumnBtn: function (addNewColBtn){
+        addNewColBtn.disabled = true;
+        addNewColBtn.style.filter = "saturate(0%)";
+    },
+
     showCustomStatuses: function (customStatuses){
-        console.log(customStatuses)
         let boardsContainer = document.querySelector('#boards');
         for (let child of boardsContainer.children) {
             let boardID = child.dataset.boardId;
@@ -85,7 +84,9 @@ export let dom = {
                         </div>`)
                     }
                 }
+                dom.checkColumnCount(boardID)
         }
+
     },
 
     loadBoards: function () {
@@ -103,7 +104,6 @@ export let dom = {
             dom.showDefaultStatuses(defaultStatuses);
             dom.showCustomStatuses(customStatuses)
             dom.showCards(cards);
-            dom.setDefaultFocusTarget();
             dom.initCollapseBoard();
             dom.initAddNewColumnListeners()
             dom.initCardEventListeners();
@@ -148,7 +148,7 @@ export let dom = {
     showModal: function() {
         document.querySelector(".bg-modal").style.display = "block";
     },
-    saveBoardNameChange: function (evt){
+    saveBoardNameChange: function (){
         let newBoardName = document.querySelector('.modalInput').value;
         let boardID = document.querySelector('.modalInput').id;
         dataHandler.updateBoardTitle({"board_name": newBoardName, "id": boardID})
@@ -261,15 +261,28 @@ export let dom = {
         let cardDeleteButtons = document.querySelectorAll('.card-delete.fa-trash-alt');
         let inputFields = document.querySelectorAll('.card-title-change');
         for(let card of cards){
-            card.addEventListener('click', dom.showCardTitleInput)
+            card.addEventListener('click', dom.showCardTitleInput);
+            card.addEventListener('mouseleave', dom.closeInput)
         }
         for(let field of inputFields){
-            field.addEventListener('keydown', dom.initTitleChange)
+            field.addEventListener('keydown', dom.initTitleChange);
         }
         for(let cardDeleteButton of cardDeleteButtons){
-            cardDeleteButton.addEventListener('click', dom.deleteCard)
+            cardDeleteButton.addEventListener('click', dom.deleteCard);
         }
     },
+
+    closeInput: function (evt){
+        let inputField = evt.target.querySelector('input');
+        let cardID = dom.focusTarget.dataset.cardId;
+        if(!inputField.classList.contains('hide-element')){
+            inputField.closest('.card-title').childNodes[2].textContent = '';
+            inputField.classList.add('hide-element');
+            dataHandler.getCardTitle({'card_id': cardID})
+                .then((response) => inputField.after(response['title']))
+        }
+    },
+
     deleteBoard: function(event){
         let board = event.target.closest("section");
         let boardId = board.dataset.boardId;
