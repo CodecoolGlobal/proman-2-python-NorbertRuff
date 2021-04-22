@@ -424,12 +424,10 @@ export let dom = {
         },
 
         initRegistrationForm: function() {
-            document.body.insertAdjacentHTML("afterbegin", "<h3 id='sign-up'>Sign up</h3>")
             document.getElementById("sign-up").addEventListener('click', dom.showRegistrationForm)
         },
 
         initLoginForm: function() {
-            document.body.insertAdjacentHTML("afterbegin", "<h3 id='login'>Login</h3>")
             document.getElementById("login").addEventListener('click', dom.showLoginForm)
         },
 
@@ -494,5 +492,9 @@ export let dom = {
             dom.closeModal()
             dataHandler.postLoginData(username, password).then(dom.loadBoards)
         },
+
+        initHeader: function() {
+            dataHandler.getLoggedInUser().then(data => );
+        }
 };
 
