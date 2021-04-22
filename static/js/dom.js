@@ -377,8 +377,10 @@ export let dom = {
             let archiveButtons = document.querySelectorAll(".card-archive")
             archiveButtons.forEach((item) => {
                 item.addEventListener('click', () => {
-                    let cardID = item.closest(".card").getAttribute('id').match(/[0-9]+/)[0]
+                    let card = item.closest(".card")
+                    let cardID = card.getAttribute('id').match(/[0-9]+/)[0]
                     dataHandler.archiveCard({'card_id': cardID })
+                    card.remove();
                 })
             })
         },

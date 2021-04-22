@@ -92,7 +92,8 @@ export let dataHandler = {
 
     archiveCard: function (data){
         this._api_post('/archive-card', data, () => {
-        console.log('card has been archived!')});
+        // add modal with notification 
+        });
     },
 
     newStatus: function (data) {
