@@ -9,7 +9,6 @@ export let dom = {
         dom.initHeader();
         dom.initLoginForm();
         dom.initRegistrationForm();
-        dom.initInputClose();
         dom.initModalClose();
     },
 
