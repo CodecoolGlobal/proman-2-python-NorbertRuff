@@ -46,7 +46,10 @@ export let dom = {
                 <div class="board-column-title">${response.title}<i class="column-delete fas fa-trash-alt"></i></div>
                 <div id="status-id-${response.id}" class="board-column-content" data-status-id="${response.id}"></div>
                 </div>`))
-                .then(() => dom.checkColumnCount(boardID))
+                .then(() => {
+                    dom.checkColumnCount(boardID);
+                    dom.loadBoards();
+                })
             dom.closeModal()
         }
     },

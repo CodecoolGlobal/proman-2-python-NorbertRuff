@@ -110,6 +110,7 @@ section.board-private {
 
 .column-delete{
     padding: 0 10px;
+    cursor: pointer;
 }
 
 .board-toggle{
