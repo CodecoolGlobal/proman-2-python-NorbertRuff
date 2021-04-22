@@ -94,6 +94,15 @@ def update_board_title():
         return jsonify({"response": "There was an error during execution of your request"})
 
 
+@app.route("/get-board", methods=["POST"])
+@json_response
+def get_board_name():
+    """Get board's name from the ID"""
+    username = session.get('username', None)
+    board_id = request.get_json()['board_id']
+    return data_handler.get_board(board_id)
+
+
 @app.route("/get-boards")
 @json_response
 def get_boards():

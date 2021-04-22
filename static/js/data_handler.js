@@ -43,8 +43,12 @@ export let dataHandler = {
     })
     },
 
-    getBoard: function (boardId, callback) {
-        // the board is retrieved and then the callback function is called with the board
+    getBoard: function (data, callback) {
+        return new Promise ((resolve, reject) => {
+            this._api_post('/get-board', data,(response) => {
+            resolve(response)
+        });
+    })
     },
 
     getDefaultStatuses: function () {
