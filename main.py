@@ -120,9 +120,10 @@ def save_new_private_board():
     # TODO "and 'username' in session" in the below if statement, once we have sessions
     if request.method == 'POST':
         board_title = request.get_json()
-        board_user_id = session.get('username')
-        print(board_title, board_user_id)
-        data_handler.save_new_private_board(board_title, board_user_id)
+        username = session.get('username')
+        user_id = data_handler.get_user_id_from_username(username)['id']
+        print(board_title, user_id)
+        data_handler.save_new_private_board(board_title, user_id)
         return jsonify({"response": "OK"})
     else:
         return redirect(url_for('index'))

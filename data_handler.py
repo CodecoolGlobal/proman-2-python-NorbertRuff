@@ -196,3 +196,14 @@ def get_user_login_data(cursor, username):
     var = {'username': username}
     cursor.execute(query, var)
     return cursor.fetchall()
+
+
+@connection.connection_handler
+def get_user_id_from_username(cursor, username):
+    query = """
+        SELECT id FROM users
+        WHERE name = %(username)s
+        """
+    var = {'username': username}
+    cursor.execute(query, var)
+    return cursor.fetchone()
