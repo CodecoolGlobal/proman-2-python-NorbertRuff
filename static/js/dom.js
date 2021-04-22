@@ -85,7 +85,8 @@ export let dom = {
             dom.initAddNewColumnListeners()
             dom.initCardEventListeners();
             dom.initDragAndDrop();
-            dom.setupAddNewCardsBTN()
+            dom.setupAddNewCardsBTN();
+            dom.setArchiveListener();
         })
 
     },
@@ -259,8 +260,7 @@ export let dom = {
     insertElement: (draggable, container, below, afterElement) => {
             if (below) {
                 container.appendChild(draggable);
-            }
-            else {
+            } else {
                 container.insertBefore(draggable, afterElement)
             }
     },
@@ -371,6 +371,16 @@ export let dom = {
                             <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
                             <div class="card-title">${customTitle}</div>
                             </div>`);
-        }
+        },
+
+        setArchiveListener: () => {
+            let archiveButtons = document.querySelectorAll(".card-archive")
+            archiveButtons.forEach((item) => {
+                item.addEventListener('click', () => {
+                    let cardID = item.closest(".card").getAttribute('id').match(/[0-9]+/)[0]
+                    dataHandler.archiveCard({'card_id': cardID })
+                })
+            })
+        },
 };
 

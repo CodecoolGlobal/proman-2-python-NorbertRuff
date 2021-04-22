@@ -95,7 +95,6 @@ def create_card():
     return ""
 
 
-
 @app.route("/update-cards", methods=["POST"])
 def update_cards():
     card_id = request.get_json()['card_id']
@@ -105,6 +104,16 @@ def update_cards():
     try:
         data_handler.update_card_data(card_id, board_id, status_id)
         data_handler.update_cards_order(cards_order)
+        return jsonify({"response": "OK"})
+    except:
+        return jsonify({"response": "There was an error during execution of your request"})
+
+
+@app.route("/archive-card", methods=["POST"])
+def archive_card():
+    card_id = request.get_json()['card_id']
+    try:
+        data_handler.archive_card(card_id)
         return jsonify({"response": "OK"})
     except:
         return jsonify({"response": "There was an error during execution of your request"})

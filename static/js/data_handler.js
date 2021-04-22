@@ -90,6 +90,11 @@ export let dataHandler = {
         });
     },
 
+    archiveCard: function (data){
+        this._api_post('/archive-card', data, () => {
+        console.log('card has been archived!')});
+    },
+
     newStatus: function (data) {
         return new Promise ((resolve, reject) => {
             this._api_post('/new-status', data,(response) => {

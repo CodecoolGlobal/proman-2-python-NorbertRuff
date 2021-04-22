@@ -112,7 +112,7 @@ def get_all_cards(cursor, username):
         ON c.board_id = b.id
     LEFT JOIN users u
         ON b.user_id = u.id
-    WHERE b.user_id IS NULL OR u.name = %(username)s
+    WHERE c.archived=false AND b.user_id IS NULL OR c.archived=false AND u.name = %(username)s 
     ORDER BY c.card_order
     """
     var = {'username': username}
@@ -143,3 +143,26 @@ def update_cards_order(cursor, new_order):
         var = {'card_id': card_id, 'new_position': new_position}
         cursor.execute(query, var)
         new_position += 1
+
+
+@connection.connection_handler
+def archive_card(cursor, card_id):
+    query = """
+        UPDATE cards
+        SET archived=true
+        WHERE id = %(card_id)s
+        """
+    var = {"card_id": card_id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
+def restore_card(cursor, card_id):
+    query = """
+        UPDATE cards
+        SET archived=false
+        WHERE id = %(card_id)s
+        """
+    var = {"card_id": card_id}
+    cursor.execute(query, var)
+
