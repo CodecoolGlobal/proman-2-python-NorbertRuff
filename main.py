@@ -14,11 +14,28 @@ def index():
     return render_template('index.html')
 
 
+@app.route("/get-custom-statuses")
+@json_response
+def get_custom_statuses():
+    """Returns with custom board statuses of all the user's boards. If no user is logged in
+    then only returns all custom statuses of all public boards"""
+    username = session.get('username', 'test@password.com')
+    if username:
+        user_id = data_handler.get_user_id(username)['id']
+        return data_handler.get_board_custom_statuses(user_id)
+    else:
+        return data_handler.get_public_boards_custom_statuses()
+
+
 @json_response
 @app.route("/new-status", methods=["POST"])
 def add_new_status():
+    """Adds new status/column to the DB and returns with it's ID and title"""
     title = request.get_json()['title']
-    return data_handler.add_new_status(title)
+    board_id = request.get_json()['board_id']
+    new_status = data_handler.add_new_status(title)
+    data_handler.add_custom_status(board_id, new_status['id'])
+    return new_status
 
 
 @json_response
