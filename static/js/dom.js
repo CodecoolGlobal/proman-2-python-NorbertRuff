@@ -36,6 +36,7 @@ export let dom = {
         dom.showModal();
         dom.createModal('column')
         let columnArea = evt.currentTarget.closest('section').querySelector(".board-columns");
+        document.querySelector('#saveChanges').innerHTML = "Add column"
         document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title');
             dataHandler.newStatus({"title": customTitle.value, "board_id": boardID})
@@ -102,6 +103,7 @@ export let dom = {
             let defaultStatuses = data[1]
             let cards = data[2]
             let customStatuses = data[3]
+            let loggedInUser = data[4]
             dom.showBoards(boards);
             dom.showDefaultStatuses(defaultStatuses);
             dom.showCustomStatuses(customStatuses)
@@ -372,6 +374,7 @@ export let dom = {
      initNewBoardCreate: function(event){
         dom.showModal()
         dom.createModal("Board")
+        document.querySelector('#saveChanges').innerHTML = "Add board"
         document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title')
             if (event.target.id === "add_public_board") {
@@ -441,6 +444,7 @@ export let dom = {
             let statusId =  0;
             dom.showModal()
             dom.createModal("Card")
+            document.querySelector('#saveChanges').innerHTML = "Add card"
             document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title')
                 dom.addNewCardToBoard(customTitle.value, cardContainers);
@@ -486,6 +490,7 @@ export let dom = {
         },
 
         initRegistrationDataSubmit: function() {
+            document.querySelector('#saveChanges').innerHTML = "Submit"
             document.querySelector('#saveChanges').onclick = function() {
                 dom.postDataFromRegistrationForm();
             }
@@ -494,8 +499,10 @@ export let dom = {
         postDataFromRegistrationForm: function() {
             let new_username = document.getElementById("new_username").value
             let new_password = document.getElementById("new_password").value
-            dom.closeModal()
-            dataHandler.createNewUser(new_username, new_password).then(dom.loadBoards)
+            if (new_username.length > 0 && new_password.length > 0) {
+                dom.closeModal()
+                dataHandler.createNewUser(new_username, new_password).then(dom.loadBoards)
+            }
         },
 
         showLoginForm: function() {
@@ -518,6 +525,7 @@ export let dom = {
         },
 
         initLoginDataSubmit: function() {
+            document.querySelector('#saveChanges').innerHTML = "Login"
             document.querySelector('#saveChanges').onclick = function() {
                 dom.postDataFromLoginForm();
             }
@@ -526,9 +534,12 @@ export let dom = {
         postDataFromLoginForm: function() {
             let username = document.getElementById("username").value
             let password = document.getElementById("password").value
-            dom.closeModal()
-            dataHandler.postLoginData(username, password).then(dom.loadBoards)
+            if (username.length > 0 && password.length > 0) {
+                dom.closeModal()
+                dataHandler.postLoginData(username, password).then(dom.loadBoards)
+            }
         },
+
 
         initHeader: function() {
             dataHandler.getLoggedInUser().then(function(data) {
@@ -544,6 +555,7 @@ export let dom = {
                     document.getElementById("logout").classList.remove('hide-element');
                     document.getElementById("user-display").classList.remove('hide-element');
                     document.getElementById("add_private_board").classList.remove('hide-element');
+                    document.getElementById("user-display").innerHTML = data.username
                 }
             })
         }

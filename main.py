@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, session, request, jsonify
+from flask import Flask, render_template, redirect, url_for, session, request, jsonify, flash
 from util import json_response
 import password_hasher
 
@@ -22,7 +22,7 @@ def index():
 def get_custom_statuses():
     """Returns with custom board statuses of all the user's boards. If no user is logged in
     then only returns all custom statuses of all public boards"""
-    username = session.get('username', 'test@password.com')
+    username = session.get('username', '')
     if username:
         user_id = data_handler.get_user_id(username)['id']
         return data_handler.get_board_custom_statuses(user_id)
@@ -194,7 +194,6 @@ def login():
                 valid_password = password_hasher.verify_password(password, hashed_password)
                 if valid_password:
                     session["username"] = user_data[0]["name"]
-
                 return jsonify({"response": "OK"})
             except:
                 return jsonify({"response": "There was an error during the login process"})
