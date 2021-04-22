@@ -283,15 +283,17 @@ def restore_card(cursor, card_id):
         UPDATE cards
         SET archived=false
         WHERE id = %(card_id)s
+        RETURNING id, title, board_id, status_id
         """
     var = {"card_id": card_id}
     cursor.execute(query, var)
+    return cursor.fetchall()
 
 
 @connection.connection_handler
 def get_archived_cards(cursor, username):
     query = """
-            SELECT c.id, c.title
+            SELECT c.id, c.title, c.board_id, c.status_id
             FROM cards c
             JOIN boards b
                 ON c.board_id = b.id

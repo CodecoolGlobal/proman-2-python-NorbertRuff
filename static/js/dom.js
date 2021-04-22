@@ -566,11 +566,9 @@ export let dom = {
             dom.createArchivedCardsModal()
             document.querySelector('#saveChanges').onclick = function() {
                 dom.closeModal()
-                location.reload()
             }
             document.querySelector('#close').onclick = function() {
                 dom.closeModal()
-                location.reload()
             }
         },
 
@@ -593,8 +591,20 @@ export let dom = {
                         let card = item.closest(".card")
                         let cardID = card.getAttribute('id').match(/[0-9]+/)[0]
                         dataHandler.restoreCard({'card_id': cardID })
-                        card.remove();
-                        })
+                            .then((data) => {
+                               let cardData = data[0]
+                               let board = document.querySelector(`#board-id-${cardData.board_id}`)
+                               let column = board.querySelector(`#status-id-${cardData.status_id}`)
+                               column.insertAdjacentHTML('beforeend',
+                           `<div id="card-id-${card['id']}" data-card-id="${cardData.id}" class="card" draggable="true">
+                                <div class="card-remove"><i class="card-delete fas fa-trash-alt"></i></div>
+                                <div class="card-archive"><i class="fa fa-cloud"></i></div>
+                                <div class="card-title">
+                                    <input value="${cardData.title}" class="card-title-change hide-element">${cardData.title}
+                                </div>
+                            </>`)
+                            card.remove();})
+                                                })
                     })
                     let cardDeleteButtons = document.querySelectorAll('.card-remove');
                     for(let cardDeleteButton of cardDeleteButtons){

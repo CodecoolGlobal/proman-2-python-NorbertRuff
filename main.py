@@ -242,11 +242,12 @@ def get_archived_cards():
 
 
 @app.route("/restore-card", methods=["POST"])
+@json_response
 def restore_card():
     card_id = request.get_json()['card_id']
     try:
-        data_handler.restore_card(card_id)
-        return jsonify({"response": "OK"})
+        print(data_handler.restore_card(card_id))
+        return data_handler.restore_card(card_id)
     except:
         return jsonify({"response": "There was an error during execution of your request"})
 
