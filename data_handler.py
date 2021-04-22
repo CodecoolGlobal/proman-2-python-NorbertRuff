@@ -91,7 +91,6 @@ def save_new_card(cursor, board_id, title, status_id, cards_order, archived):
     cursor.execute(query, var)
 
 
-
 @connection.connection_handler
 def get_default_statuses(cursor):
     query = """
@@ -128,6 +127,16 @@ def update_card_data(cursor, card_id, board_id, status_id):
         WHERE id = %(card_id)s;
         """
     var = {'card_id': card_id, 'board_id': board_id, 'status_id': status_id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
+def remove_card(cursor, card_id):
+    query = """
+        DELETE FROM cards
+        WHERE id = %(card_id)s;
+        """
+    var = {'card_id': card_id}
     cursor.execute(query, var)
 
 

@@ -229,6 +229,7 @@ export let dom = {
 
     initCardEventListeners: function(){
         let cards = document.querySelectorAll('.card');
+        let cardDeleteButtons = document.querySelectorAll('.fa-trash-alt');
         let inputFields = document.querySelectorAll('.card-title-change');
         for(let card of cards){
             card.addEventListener('click', dom.showCardTitleInput)
@@ -236,8 +237,17 @@ export let dom = {
         for(let field of inputFields){
             field.addEventListener('keydown', dom.initTitleChange)
         }
+        for(let cardDeleteButton of cardDeleteButtons){
+            cardDeleteButton.addEventListener('click', dom.deleteCard)
+        }
     },
 
+    deleteCard: function(event){
+        let card = event.target.parentElement.parentElement
+        let cardId = card.dataset.cardId;
+        dataHandler.removeCard(cardId)
+            .then(() => card.remove())
+    },
     showCardTitleInput: function (evt){
         let titleDiv = evt.currentTarget.querySelector('.card-title');
         titleDiv.childNodes[2].textContent = '';

@@ -89,7 +89,13 @@ export let dataHandler = {
         this._api_post('/update-cards', data, () => {
         });
     },
-
+    removeCard: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/remove-card', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
     newStatus: function (data) {
         return new Promise ((resolve, reject) => {
             this._api_post('/new-status', data,(response) => {
