@@ -86,7 +86,7 @@ export let dataHandler = {
     })
     },
 
-    updateCards: function (data){
+    updateCards: function (data) {
         this._api_post('/update-cards', data, () => {
         });
     },
@@ -104,6 +104,27 @@ export let dataHandler = {
         });
     })
     },
+
+    archiveCard: function (data) {
+        this._api_post('/archive-card', data, () => {
+        // add modal with notification
+        });
+    },
+
+    getArchivedCards: function () {
+        return new Promise ((resolve, reject) => {
+            this._api_get('/get-archived-cards', (response) => {
+            this._data['archived-cards'] = response;
+            resolve(response)
+            });
+        })
+    },
+
+    restoreCard: function (data) {
+        this._api_post('/restore-card', data, () => {
+        });
+    },
+
     newStatus: function (data) {
         return new Promise ((resolve, reject) => {
             this._api_post('/new-status', data,(response) => {
@@ -127,7 +148,13 @@ export let dataHandler = {
     getCard: function (cardId, callback) {
         // the card is retrieved and then the callback function is called with the card
     },
-
+    removeStatus: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/remove-status', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
     createNewPublicBoard: function (boardTitle) {
         // creates new board, saves it and calls the callback function with its data
         return new Promise ((resolve, reject) => {

@@ -137,6 +137,18 @@ def save_new_private_board(cursor, board_title, board_user_id):
 
 
 @connection.connection_handler
+def remove_status(cursor, status__id):
+    query = """
+        DELETE FROM custom_board_statuses
+        WHERE status_id = %(status__id)s;
+        DELETE FROM statuses
+        WHERE id = %(status__id)s;
+        """
+    var = {'status__id': status__id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
 def save_new_card(cursor, board_id, title, status_id, cards_order, archived):
     query = """
             INSERT INTO cards values (DEFAULT, %(data1)s, %(data2)s, %(data3)s, %(data4)s, %(data5)s);
@@ -165,7 +177,7 @@ def get_all_cards(cursor, username):
         ON c.board_id = b.id
     LEFT JOIN users u
         ON b.user_id = u.id
-    WHERE b.user_id IS NULL OR u.name = %(username)s
+    WHERE c.archived=false AND b.user_id IS NULL OR c.archived=false AND u.name = %(username)s 
     ORDER BY c.card_order
     """
     var = {'username': username}
@@ -252,3 +264,42 @@ def get_user_id_from_username(cursor, username):
     var = {'username': username}
     cursor.execute(query, var)
     return cursor.fetchone()
+
+
+@connection.connection_handler
+def archive_card(cursor, card_id):
+    query = """
+        UPDATE cards
+        SET archived=true
+        WHERE id = %(card_id)s
+        """
+    var = {"card_id": card_id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
+def restore_card(cursor, card_id):
+    query = """
+        UPDATE cards
+        SET archived=false
+        WHERE id = %(card_id)s
+        """
+    var = {"card_id": card_id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
+def get_archived_cards(cursor, username):
+    query = """
+            SELECT c.id, c.title
+            FROM cards c
+            JOIN boards b
+                ON c.board_id = b.id
+            LEFT JOIN users u
+                ON b.user_id = u.id
+            WHERE c.archived=true AND b.user_id IS NULL OR c.archived=true AND u.name = %(username)s 
+            ORDER BY c.card_order
+                """
+    var = {"username": username}
+    cursor.execute(query, var)
+    return cursor.fetchall()

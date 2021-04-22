@@ -44,10 +44,13 @@ export let dom = {
                     columnArea.insertAdjacentHTML(
                         'beforeend', `
                 <div class="board-column">
-                <div class="board-column-title">${response.title}</div>
+                <div class="board-column-title">${response.title}<i class="column-delete fas fa-trash-alt"></i></div>
                 <div id="status-id-${response.id}" class="board-column-content" data-status-id="${response.id}"></div>
                 </div>`))
-                .then(() => dom.checkColumnCount(boardID))
+                .then(() => {
+                    dom.checkColumnCount(boardID);
+                    dom.loadBoards();
+                })
             dom.closeModal()
         }
     },
@@ -61,6 +64,7 @@ export let dom = {
         } else{
             dom.enableAddNewColumnBtn(addNewColBtn)
         }
+        dom.initStatusDeleteBTN();
     },
 
     enableAddNewColumnBtn: function (addNewColBtn){
@@ -82,7 +86,7 @@ export let dom = {
                     if(status['board_id'] === parseInt(boardID)){
                         columnContent.insertAdjacentHTML('beforeend', `
                         <div class="board-column">
-                        <div class="board-column-title">${status['title']}</div>
+                        <div class="board-column-title">${status['title']}`+ (status['status_id'] > 3 ? '<i class="column-delete fas fa-trash-alt"></i>': "") + `</div>
                         <div id="status-id-${status['status_id']}" class="board-column-content" data-status-id="${status['status_id']}"></div>
                         </div>`)
                     }
@@ -113,14 +117,18 @@ export let dom = {
             dom.initAddNewColumnListeners()
             dom.initCardEventListeners();
             dom.initDragAndDrop();
-            dom.setupAddNewCardsBTN()
+            dom.setupAddNewCardsBTN();
+            dom.setArchiveListener();
+            dom.initArchivedCardsButton();
+            dom.initStatusDeleteBTN();
         })
 
     },
 
     showBoards: function (boards) {
         let boardsContainer = document.querySelector('#boards');
-        boardsContainer.innerHTML = ''
+        boardsContainer.classList.remove('center-content');
+        boardsContainer.innerHTML = '';
         boardsContainer.classList.add('board-container')
         for (let board of boards){
             let addPrivateClass
@@ -204,14 +212,15 @@ export let dom = {
            column.insertAdjacentHTML('beforeend',
                `<div id="card-id-${card['id']}" data-card-id="${card.id}" class="card" draggable="true">
                     <div class="card-remove"><i class="card-delete fas fa-trash-alt"></i></div>
+                    <div class="card-archive"><i class="fa fa-cloud"></i></div>
                     <div class="card-title">
                         <input value="${card.title}" class="card-title-change hide-element">${card.title}
                     </div>
-                </div>`)
+                </>`)
        }
     },
 
-       initCollapseBoard: () => {
+    initCollapseBoard: () => {
         let toggleButtons = document.querySelectorAll(".board-toggle");
         for (let button of toggleButtons) {
             button.firstChild.classList.remove('fa-chevron-down') // set default to up button
@@ -305,6 +314,23 @@ export let dom = {
         dataHandler.removeCard(cardId)
             .then(() => card.remove())
     },
+    initStatusDeleteBTN: function (){
+        let statusDeleteButtons = document.querySelectorAll('.column-delete.fa-trash-alt');
+        for(let statusDeleteButton of statusDeleteButtons){
+            statusDeleteButton.addEventListener('click', dom.deleteStatus)
+        }
+    },
+    deleteStatus: function(event){
+        let cards = event.target.parentElement.parentElement.querySelector('.board-column-content')
+        for (let card of cards.childNodes){
+            let cardId = card.dataset.cardId
+            dataHandler.removeCard(cardId)
+                .then(() => card.remove())
+        }
+        dataHandler.removeStatus(cards.dataset.statusId)
+            .then(() => event.target.closest('.board-column').remove())
+        dom.checkColumnCount(event.target.closest("section").dataset.boardId)
+    },
     showCardTitleInput: function (evt){
         let titleDiv = evt.currentTarget.querySelector('.card-title');
         titleDiv.childNodes[2].textContent = '';
@@ -325,8 +351,7 @@ export let dom = {
     insertElement: (draggable, container, below, afterElement) => {
             if (below) {
                 container.appendChild(draggable);
-            }
-            else {
+            } else {
                 container.insertBefore(draggable, afterElement)
             }
     },
@@ -399,35 +424,6 @@ export let dom = {
             `);
         },
 
-        // Creates new public board with title adds after last board
-         createNewPublicBoard: function(customTitle) {
-            let boards = document.querySelectorAll('section');
-            let lastBoard = document.querySelector('section:last-child');
-            lastBoard.insertAdjacentHTML('afterend', `
-                        <section id="board-id-${boards.length + 1}" class="board" data-board-id="${boards.length + 1}">
-                            <div class="board-header"><span class="board-title">${customTitle}</span>
-                                <button class="card-add">Add Card</button>
-                                <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
-                            </div>
-                            <div class="board-columns"></div>
-                        </section>
-                    `);
-        },
-
-        // Creates new private board with title adds after last board
-         createNewPrivateBoard: function(customTitle) {
-            let boards = document.querySelectorAll('section');
-            let lastBoard = document.querySelector('section:last-child');
-            lastBoard.insertAdjacentHTML('afterend', `
-                        <section id="board-id-${boards.length + 1}" class="board private-board" data-board-id="${boards.length + 1}">
-                            <div class="board-header"><span class="board-title">${customTitle}</span>
-                                <button class="card-add">Add Card</button>
-                                <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
-                            </div>
-                            <div class="board-columns"></div>
-                        </section>
-                    `);
-        },
 
         setupAddNewCardsBTN: function(){
             let addCardButtons = document.getElementsByClassName("card-add");
@@ -558,6 +554,65 @@ export let dom = {
                     document.getElementById("user-display").innerHTML = data.username
                 }
             })
-        }
+        },
+
+        setArchiveListener: () => {
+            let archiveButtons = document.querySelectorAll(".card-archive")
+            archiveButtons.forEach((item) => {
+                item.addEventListener('click', () => {
+                    let card = item.closest(".card")
+                    let cardID = card.getAttribute('id').match(/[0-9]+/)[0]
+                    dataHandler.archiveCard({'card_id': cardID })
+                    card.remove();
+                })
+            })
+        },
+
+        initArchivedCardsButton: () => {
+            let archivedCardsButton = document.querySelector("#archived_cards");
+            archivedCardsButton.addEventListener('click', dom.showArchivedMessages);
+        },
+
+        showArchivedMessages: () => {
+            dom.showModal()
+            dom.createArchivedCardsModal()
+            document.querySelector('#saveChanges').onclick = function() {
+                dom.closeModal()
+                location.reload()
+            }
+            document.querySelector('#close').onclick = function() {
+                dom.closeModal()
+                location.reload()
+            }
+        },
+
+        createArchivedCardsModal: function(){
+            let modalContent = document.querySelector('.modal-content')
+            modalContent.innerHTML = '<h2>Archived cards</h2>';
+            dataHandler.getArchivedCards()
+                .then((cards) => {
+                    for (let card of cards) {
+                        modalContent.insertAdjacentHTML('beforeend', `
+                       <div id="card-id-${card['id']}" data-card-id="${card.id}" class="card">
+                        <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
+                        <div class="card-restore"><i class="fa fa-history"></i></div>
+                        <div class="card-title">${card.title}</div>
+                        </div>`)
+                    }
+                    let restoreCardButtons = document.querySelectorAll(".card-restore")
+                    restoreCardButtons.forEach((item) => {
+                        item.addEventListener('click', () => {
+                        let card = item.closest(".card")
+                        let cardID = card.getAttribute('id').match(/[0-9]+/)[0]
+                        dataHandler.restoreCard({'card_id': cardID })
+                        card.remove();
+                        })
+                    })
+                    let cardDeleteButtons = document.querySelectorAll('.card-remove');
+                    for(let cardDeleteButton of cardDeleteButtons){
+                                cardDeleteButton.addEventListener('click', dom.deleteCard);
+                    }
+                })
+        },
 };
 
