@@ -548,7 +548,6 @@ export let dom = {
                     document.getElementById("add_private_board").classList.remove('hide-element');
                 }
             })
-        }
         },
 
         setArchiveListener: () => {
@@ -603,6 +602,10 @@ export let dom = {
                         card.remove();
                         })
                     })
+                    let cardDeleteButtons = document.querySelectorAll('.card-remove');
+                    for(let cardDeleteButton of cardDeleteButtons){
+                                cardDeleteButton.addEventListener('click', dom.deleteCard);
+                    }
                 })
         },
 };
