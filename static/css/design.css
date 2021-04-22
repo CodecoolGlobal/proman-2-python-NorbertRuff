@@ -183,6 +183,15 @@ section.board-private {
     cursor: pointer;
 }
 
+.card-archive, .card-restore{
+    display: block;
+    position: absolute;
+    top: 22px;
+    right: 6px;
+    font-size:9px;
+    cursor: pointer;
+}
+
 .card-title{
     padding: 2px 16px 2px 2px;
     border-width: 2px;

@@ -86,7 +86,7 @@ export let dataHandler = {
     })
     },
 
-    updateCards: function (data){
+    updateCards: function (data) {
         this._api_post('/update-cards', data, () => {
         });
     },
@@ -104,6 +104,27 @@ export let dataHandler = {
         });
     })
     },
+
+    archiveCard: function (data) {
+        this._api_post('/archive-card', data, () => {
+        // add modal with notification
+        });
+    },
+
+    getArchivedCards: function () {
+        return new Promise ((resolve, reject) => {
+            this._api_get('/get-archived-cards', (response) => {
+            this._data['archived-cards'] = response;
+            resolve(response)
+            });
+        })
+    },
+
+    restoreCard: function (data) {
+        this._api_post('/restore-card', data, () => {
+        });
+    },
+
     newStatus: function (data) {
         return new Promise ((resolve, reject) => {
             this._api_post('/new-status', data,(response) => {
