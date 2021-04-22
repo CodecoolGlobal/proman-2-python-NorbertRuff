@@ -83,6 +83,15 @@ def save_new_board(cursor, json_data):
 
 
 @connection.connection_handler
+def save_new_private_board(cursor, board_title, board_user_id):
+    query = """
+            INSERT INTO boards values (DEFAULT, %(board_title)s, %(board_user_id)s);
+            """
+    var = {'board_title': board_title, 'board_user_id': board_user_id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
 def save_new_card(cursor, board_id, title, status_id, cards_order, archived):
     query = """
             INSERT INTO cards values (DEFAULT, %(data1)s, %(data2)s, %(data3)s, %(data4)s, %(data5)s);

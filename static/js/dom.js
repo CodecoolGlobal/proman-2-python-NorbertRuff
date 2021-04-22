@@ -5,15 +5,20 @@ export let dom = {
     focusTarget: '',
     // This function should run once, when the page is loaded.
     init: function () {
-        dom.initNewPublicBoardButton();
+        dom.initNewBoardButtons();
         dom.initInputClose();
         dom.initModalClose();
     },
 
-    initNewPublicBoardButton: function () {
-        let addNewPublicBoardBTN = document.querySelector("#add_public_board");
-        addNewPublicBoardBTN.addEventListener('click', dom.initNewBoardCreate);
+    initNewBoardButtons: function () {
+        let addNewPublicBoardButton = document.querySelector("#add_public_board");
+        addNewPublicBoardButton.addEventListener('click', dom.initNewBoardCreate);
+
+        // TODO ide kell még egy feltétel, hogy ez a button csak akkor látszódjon, ha van belogolt user
+        let addNewPrivateBoardButton = document.querySelector("#add_private_board");
+        addNewPrivateBoardButton.addEventListener('click', dom.initNewBoardCreate);
     },
+
 
     initModalClose: function (){
         document.querySelector('.close').addEventListener('click', this.closeModal)
@@ -314,14 +319,20 @@ export let dom = {
     },
 
     // Main function for setting up, creating, saving new board
-     initNewBoardCreate: function(){
+     initNewBoardCreate: function(event){
         dom.showModal()
         dom.createModal("Board")
         document.querySelector('#saveChanges').onclick = function() {
             let customTitle = document.querySelector('#new_title')
-            dom.createNewPBoard(customTitle.value);
-            dataHandler.createNewBoard(customTitle.value)
-            .then(dom.loadBoards);
+            console.log(event.target.id)
+            if (event.target.id === "add_public_board") {
+                dataHandler.createNewPublicBoard(customTitle.value)
+                .then(dom.loadBoards);
+            }
+            else if (event.target.id === "add_private_board") {
+                dataHandler.createNewPrivateBoard(customTitle.value)
+                .then(dom.loadBoards);
+            }
             dom.closeModal()
             }
         },
@@ -337,7 +348,7 @@ export let dom = {
         },
 
         // Creates new public board with title adds after last board
-         createNewPBoard: function(customTitle) {
+         createNewPublicBoard: function(customTitle) {
             let boards = document.querySelectorAll('section');
             let lastBoard = document.querySelector('section:last-child');
             lastBoard.insertAdjacentHTML('afterend', `
@@ -350,6 +361,22 @@ export let dom = {
                         </section>
                     `);
         },
+
+        // Creates new private board with title adds after last board
+         createNewPrivateBoard: function(customTitle) {
+            let boards = document.querySelectorAll('section');
+            let lastBoard = document.querySelector('section:last-child');
+            lastBoard.insertAdjacentHTML('afterend', `
+                        <section id="board-id-${boards.length + 1}" class="board private-board" data-board-id="${boards.length + 1}">
+                            <div class="board-header"><span class="board-title">${customTitle}</span>
+                                <button class="card-add">Add Card</button>
+                                <button class="board-toggle"><i class="fas fa-chevron-down"></i></button>
+                            </div>
+                            <div class="board-columns"></div>
+                        </section>
+                    `);
+        },
+
         setupAddNewCardsBTN: function(){
             let addCardButtons = document.getElementsByClassName("card-add");
             for (let addCardButton of addCardButtons) {
