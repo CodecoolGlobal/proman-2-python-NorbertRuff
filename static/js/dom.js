@@ -166,6 +166,7 @@ export let dom = {
            column.insertAdjacentHTML('beforeend',
                `<div id="card-id-${card['id']}" data-card-id="${card.id}" class="card" draggable="true">
                     <div class="card-remove"><i class="fas fa-trash-alt"></i></div>
+                    <div class="card-archive"><i class="fa fa-file-archive"></i></div>
                     <div class="card-title">
                         <input value="${card.title}" class="card-title-change hide-element">${card.title}
                     </div>

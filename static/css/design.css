@@ -153,6 +153,15 @@ section.board{
     cursor: pointer;
 }
 
+.card-archive{
+    display: block;
+    position: absolute;
+    top: 22px;
+    right: 6px;
+    font-size: 10px;
+    cursor: pointer;
+}
+
 .card-title{
     padding: 2px 16px 2px 2px;
     border-width: 2px;
