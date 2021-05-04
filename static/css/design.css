@@ -1,0 +1,331 @@
+:root{
+    --border-radius: 3px;
+    --status-1: #f39189;
+    --status-1-contrast: #bd706a;
+    --status-2: #bb8082;
+    --status-2-contrast: #946566;
+    --status-3: #6e7582;
+    --status-3-contrast: #4d525c;
+    --status-4: #046582;
+    --status-4-contrast: #034254;
+    --status-5: #0f7a75;
+    --status-5-contrast: #0b5e5a;
+    --status-6: #248048;
+    --status-6-contrast: #1d693a;
+}
+
+html {
+    overflow-y: scroll;
+}
+
+html, body, button, input {
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.9rem;
+    color: var(--status-4-contrast);
+}
+
+p {
+
+}
+
+body {
+    min-width: 620px;
+    background: url("/static/images/background_pattern.png") repeat;
+    background-size: 300px;
+}
+
+
+h1, .board-title, .board-column-title{
+    font-weight: 100;
+}
+
+h3 {
+    text-align: center;
+    font-size: 2em;
+    letter-spacing: 5px;
+    /*transform: scale(1.2, 1);*/
+}
+
+.center-content {
+    text-align: center;
+    color: #ababab;
+}
+
+button{
+    background: rgba(0, 82, 204, 0.5);
+    color: #fff;
+    border: none;
+    font-size: 12px;
+    font-family: sans-serif;
+    padding: 8px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    height: 28px;
+    margin: 10px 2px 10px 2px;
+}
+
+button:hover{
+    background: rgba(0, 82, 204, 0.65);
+}
+
+.board-container{
+    max-width: 1024px;
+    margin: 20px auto;
+}
+
+section.board{
+    margin: 10px 20px 30px 20px;
+    border: 1px solid #cccccc;
+    background-color: #f5f5f5;
+    border-radius: 3px;
+    box-shadow: 5px 5px #cccccc;
+}
+
+section.board-private {
+    background-color: #f3e4cd;
+    box-shadow: 5px 5px #f3e4cd;
+}
+
+.board-header{
+    height: 50px;
+    /*background: #fff;*/
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.flex-grow-max {
+    flex-grow: 1;
+}
+
+.board-title{
+    margin: 13px;
+    display: inline-block;
+    font-size: 20px;
+}
+.board-title {
+    display: inline-block;
+}
+
+.column-delete{
+    padding: 0 10px;
+    cursor: pointer;
+}
+
+.board-toggle{
+    margin: 10px 2px 10px 2px;
+    background: rgba(0, 82, 204, 0.1);
+    color: rgba(0, 82, 204, 0.6);
+}
+
+.board-columns{
+    display: flex;
+    flex-wrap: nowrap;
+    background: white;
+}
+
+.board-column{
+    padding: 10px;
+    flex: 1;
+}
+
+.board-column-content{
+    min-height: 45px;
+}
+
+.board-column-content:empty{
+    /*This only works if the tag is really empty and there is not even whitespace inside*/
+    border: 4px solid rgba(205, 205, 205, 0.5);
+    margin-top: 4px;
+    border-radius: var(--border-radius);
+}
+
+.board-column-title{
+    text-align: center;
+    text-transform: uppercase;
+    margin: 6px 0 10px 0;
+}
+
+.card{
+    position: relative;
+    background: #222;
+    color: #fff;
+    border-radius: var(--border-radius);
+    margin: 8px 0;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.board-container-buttons {
+    margin: 0 25px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.board-column:nth-of-type(1) .card{
+    background: var(--status-1);
+    border: 1px solid var(--status-1-contrast);
+    box-shadow: 2px 2px var(--status-1-contrast);
+}
+
+.board-column:nth-of-type(2) .card{
+    background: var(--status-2);
+    border: 1px solid var(--status-2-contrast);
+    box-shadow: 2px 2px var(--status-2-contrast);
+}
+
+.board-column:nth-of-type(3) .card{
+    background: var(--status-3);
+    border: 1px solid var(--status-3-contrast);
+    box-shadow: 2px 2px var(--status-3-contrast);
+}
+
+.board-column:nth-of-type(4) .card{
+    background: var(--status-4);
+    border: 1px solid var(--status-4-contrast);
+    box-shadow: 2px 2px var(--status-4-contrast);
+}
+
+.board-column:nth-of-type(5) .card{
+    background: var(--status-5);
+    border: 1px solid var(--status-5-contrast);
+    box-shadow: 2px 2px var(--status-5-contrast);
+}
+
+.board-column:nth-of-type(6) .card{
+    background: var(--status-6);
+    border: 1px solid var(--status-6-contrast);
+    box-shadow: 2px 2px var(--status-6-contrast);
+}
+
+.card-remove{
+    display: block;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.card-archive, .card-restore{
+    display: block;
+    position: absolute;
+    top: 22px;
+    right: 6px;
+    font-size:9px;
+    cursor: pointer;
+}
+
+.card-title{
+    padding: 2px 16px 2px 2px;
+    border-width: 2px;
+}
+.board-title>input{
+    font-size: 20px;
+}
+.card-title>input{
+    width:100%;
+    box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    padding: 2px;
+}
+/*--------------------------modal-----------------------------*/
+.bg-modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+/* Modal Content/Box */
+.modal {
+    text-align: center;
+    align-content: center;
+    justify-content: center;
+    margin: 15% auto;
+    padding: 20px;
+    width: 300px;
+    border: 1px solid #cccccc;
+    background-color: #f5f5f5;
+    border-radius: 3px;
+    position: relative;
+    /*box-shadow: 5px 5px #cccccc;*/
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modalInput {
+    padding: 4px;
+}
+
+/*this is for the archived cards that are inside the modal*/
+.modal .card {
+    background: black;
+    border: 1px solid #2e2e2e;
+    box-shadow: 2px 2px #2e2e2e;
+    width: 220px;
+}
+
+/*--------------------------modal-----------------------------*/
+
+.close {
+  color: #aaa;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  font-size: 20px;
+  font-weight: bold;
+
+}
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-primary {
+  color: #fff;
+  background: rgba(0, 82, 204, 0.5);
+  border-color: #fed136;
+}
+.btn-primary:hover {
+  color: #fff;
+  background: rgba(0, 82, 204, 0.8);
+  border-color: #fec503;
+}
+.btn-primary:focus, .btn-primary.focus {
+  color: #fff;
+  background: rgba(0, 82, 204, 0.8);
+  border-color: #fec503;
+  box-shadow: 0 0 0 0.2rem rgba(254, 216, 84, 0.5);
+}
+
+.display-flex-element {
+  display: flex;
+}
+
+.hide-element {
+  display: none;
+}
+
+.visibility-hidden {
+  visibility: hidden;
+}
+
+.visibility-visible {
+  visibility: visible;
+}
+
+.dragging {
+    opacity: .5;
+}

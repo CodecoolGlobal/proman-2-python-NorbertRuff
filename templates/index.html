@@ -11,11 +11,36 @@
         <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='favicon/favicon-96x96.png') }}">
         <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon/favicon-16x16.png') }}">
 
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/solid.css" integrity="sha384-rdyFrfAIC05c5ph7BKz3l5NG5yEottvO/DQ0dCrwD8gzeQDjYBHNr1ucUpQuljos" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/fontawesome.css" integrity="sha384-u5J7JghGz0qUrmEsWzBQkfvc8nK3fUT7DCaQzNQ+q4oEXhGSx+P2OqjWsfIRB8QT" crossorigin="anonymous">
+
+
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/design.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/header.css') }}">
+
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
+
         <script type="module" src="{{ url_for('static', filename='js/main.js') }}" defer></script>
     </head>
     <body>
-        <h1>ProMan</h1>
-        <div id="boards">Boards are loading...</div>
+        {% include '--header.html' %}
+{#        <h3>Boards</h3>#}
+        <div class="board-container">
+            <div class="board-container-buttons">
+                <button id="add_private_board">New Private Board</button>
+                <button id="add_public_board">New Public Board</button>
+                <button id="archived_cards">Archived cards</button>
+            </div>
+        </div>
+        <div class="center-content" id="boards">Boards are loading...</div>
+        <div class="bg-modal">
+            <div class="modal">
+                <i id="close" class="fas fa-times close"></i>
+                <div class="modal-content"></div>
+                <div class="modal-footer"><button type="button" id="saveChanges" class="btn btn-primary">Save</button></div>
+            </div>
+        </div>
     </body>
 </html>

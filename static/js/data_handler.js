@@ -19,24 +19,133 @@ export let dataHandler = {
     _api_post: function (url, data, callback) {
         // it is not called from outside
         // sends the data to the API, and calls callback function
+        fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                "content-type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(json_response => callback(json_response));
     },
     init: function () {
     },
-    getBoards: function (callback) {
-        // the boards are retrieved and then the callback function is called with the boards
-
-        // Here we use an arrow function to keep the value of 'this' on dataHandler.
-        //    if we would use function(){...} here, the value of 'this' would change.
-        this._api_get('/get-boards', (response) => {
+    getBoards: function () {
+        return new Promise ((resolve, reject) => {
+            this._api_get('/get-boards', (response) => {
             this._data['boards'] = response;
-            callback(response);
+            resolve(response)
+            // callback(response);
+        });
+    })
+    },
+
+    getBoard: function (data, callback) {
+        return new Promise ((resolve, reject) => {
+            this._api_post('/get-board', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+
+    getDefaultStatuses: function () {
+        return new Promise ((resolve, reject) => {
+            this._api_get('/get-default-statuses', (response) => {
+            resolve(response)
+            // callback(response);
+        });
+    })
+    },
+
+    getCards: function () {
+        return new Promise ((resolve, reject) => {
+            this._api_get('/get-cards', (response) => {
+            this._data['cards'] = response;
+            resolve(response)
+        });
+    })
+    },
+    updateBoardTitle: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/update-board-title', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+    getCardTitle: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/get-card-title', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+    updateCardTitle: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/update-card-title', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+
+    updateCards: function (data) {
+        this._api_post('/update-cards', data, () => {
         });
     },
-    getBoard: function (boardId, callback) {
-        // the board is retrieved and then the callback function is called with the board
+    removeCard: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/remove-card', data,(response) => {
+            resolve(response)
+        });
+    })
     },
-    getStatuses: function (callback) {
-        // the statuses are retrieved and then the callback function is called with the statuses
+    removeBoard: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/remove-board', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+
+    archiveCard: function (data) {
+        this._api_post('/archive-card', data, () => {
+        // add modal with notification
+        });
+    },
+
+    getArchivedCards: function () {
+        return new Promise ((resolve, reject) => {
+            this._api_get('/get-archived-cards', (response) => {
+            this._data['archived-cards'] = response;
+            resolve(response)
+            });
+        })
+    },
+
+    restoreCard: function (data) {
+        return new Promise((resolve) => {
+            this._api_post('/restore-card', data, (response) => {
+                resolve(response)
+            })
+        })
+    },
+
+
+    newStatus: function (data) {
+        return new Promise ((resolve, reject) => {
+            this._api_post('/new-status', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+    getCustomStatuses: function (){
+        return new Promise ((resolve, reject) => {
+            this._api_get('/get-custom-statuses', (response) => {
+            resolve(response)
+        });
+    })
     },
     getStatus: function (statusId, callback) {
         // the status is retrieved and then the callback function is called with the status
@@ -47,11 +156,64 @@ export let dataHandler = {
     getCard: function (cardId, callback) {
         // the card is retrieved and then the callback function is called with the card
     },
-    createNewBoard: function (boardTitle, callback) {
-        // creates new board, saves it and calls the callback function with its data
+    removeStatus: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/remove-status', data,(response) => {
+            resolve(response)
+        });
+    })
     },
-    createNewCard: function (cardTitle, boardId, statusId, callback) {
+    createNewPublicBoard: function (boardTitle) {
+        // creates new board, saves it and calls the callback function with its data
+        return new Promise ((resolve, reject) => {
+            this._api_post('/create-board', boardTitle,(response) => {
+            resolve(response)
+            });
+        })
+    },
+
+    createNewPrivateBoard: function (boardTitle) {
+        // creates new board, saves it and calls the callback function with its data
+        return new Promise ((resolve, reject) => {
+            this._api_post('/create-private-board', boardTitle, (response) => {
+            resolve(response)
+            });
+        })
+    },
+
+    createNewCard: function (boardId, title, statusId, cardOrder, callback) { // TODO
         // creates new card, saves it and calls the callback function with its data
-    }
+        let data = {'boardId': boardId, 'title': title, 'statusId': statusId, 'cardOrder': cardOrder, 'archived': 'False'}
+        return new Promise ((resolve, reject) => {
+        this._api_post('/create-card', data,(response) => {
+             resolve(response)
+        });
+        });
+    },
     // here comes more features
+    createNewUser: function (new_username, new_password){
+        let data = {'new_username': new_username, 'new_password': new_password}
+        return new Promise ((resolve, reject) => {
+            this._api_post('/register', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+
+    postLoginData: function (username, password) {
+        let data = {'username': username, 'password': password}
+        return new Promise ((resolve, reject) => {
+            this._api_post('/login', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+    getLoggedInUser: function () {
+        return new Promise ((resolve, reject) => {
+            this._api_get('/get-logged-in-user', (response) => {
+            //this._data['username'] = response;
+            resolve(response)
+        });
+    })
+    },
 };
