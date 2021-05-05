@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, session, request, jsonify, flash
 from util import json_response
 import password_hasher
-
+import time
 import data_handler
 
 app = Flask(__name__)
@@ -130,8 +130,10 @@ def update_board_title():
 @json_response
 def get_board_name():
     """Get board's name from the ID"""
+
     username = session.get('username', None)
     board_id = request.get_json()['board_id']
+
     return data_handler.get_board(board_id)
 
 
@@ -142,6 +144,7 @@ def get_boards():
     All the boards
     """
     username = session.get('username', None)
+    time.sleep(1)
     return data_handler.get_boards(username)
 
 

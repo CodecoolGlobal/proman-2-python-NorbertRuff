@@ -97,6 +97,7 @@ export let dom = {
     },
 
     loadBoards: function () {
+        document.querySelector('.fa-sync-alt').classList.add('synchronizing')
         // retrieves boards and makes showBoards called
         let promise1 = dataHandler.getBoards()
         let promise2 = dataHandler.getDefaultStatuses()
@@ -124,6 +125,7 @@ export let dom = {
             dom.initArchivedCardsButton();
             dom.initStatusDeleteBTN();
             dom.initSyncBTN();
+            document.querySelector('.fa-sync-alt').classList.remove('synchronizing')
         })
 
     },
@@ -134,7 +136,8 @@ export let dom = {
     },
     syncAction: function(event){
         event.target.classList.add('synchronizing')
-        console.log('Sync')
+        dom.loadBoards()
+
     },
     initBoardTitleListeners: function (){
         let boardTitles = document.querySelectorAll('.board-title');
@@ -634,6 +637,7 @@ export let dom = {
 
         initHeader: function() {
             dataHandler.getLoggedInUser().then(function(data) {
+
                 if (data.username === "") {
                     document.getElementById("login").classList.remove('hide-element');
                     document.getElementById("sign-up").classList.remove('hide-element');
