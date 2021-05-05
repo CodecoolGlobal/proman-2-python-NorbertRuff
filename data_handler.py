@@ -36,6 +36,18 @@ def get_card_title(cursor, card_id):
 
 
 @connection.connection_handler
+def get_column_title(cursor, column_id):
+    query = """
+        SELECT title 
+        FROM statuses
+        WHERE id = %(id)s   
+        """
+    var = {'id': column_id}
+    cursor.execute(query, var)
+    return cursor.fetchone()
+
+
+@connection.connection_handler
 def add_new_status(cursor, title):
     """Add new status and return it"""
     query = """
@@ -90,6 +102,17 @@ def update_card_title(cursor, new_name, id):
         WHERE id = %(id)s    
     """
     var = {'title': new_name, 'id': id}
+    cursor.execute(query, var)
+
+
+@connection.connection_handler
+def update_column_title(cursor, new_name, column_id):
+    query = """
+        UPDATE statuses 
+        SET title = %(title)s
+        WHERE id = %(id)s    
+    """
+    var = {'title': new_name, 'id': column_id}
     cursor.execute(query, var)
 
 

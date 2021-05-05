@@ -52,12 +52,34 @@ def get_card_title():
         return card_title
 
 
+@json_response
+@app.route("/get-column-title", methods=["POST"])
+def get_column_title():
+    column_id = request.get_json()['column_id']
+    column_title = data_handler.get_column_title(column_id)
+    if column_title is None:
+        return {}
+    else:
+        return column_title
+
+
 @app.route("/update-card-title", methods=["POST"])
 def update_card_title():
     new_title = request.get_json()['new_title']
     card_id = request.get_json()['card_id']
     try:
         data_handler.update_card_title(new_title, card_id)
+        return jsonify({"response": "OK"})
+    except:
+        return jsonify({"response": "There was an error during execution of your request"})
+
+
+@app.route("/update-column-title", methods=["POST"])
+def update_column_title():
+    column_name = request.get_json()['column_name']
+    column_id = request.get_json()['id']
+    try:
+        data_handler.update_column_title(column_name, column_id)
         return jsonify({"response": "OK"})
     except:
         return jsonify({"response": "There was an error during execution of your request"})
@@ -222,7 +244,6 @@ def login():
 @app.route('/get-logged-in-user')
 def logged_in_user():
     user_in_session = session.get("username", "")
-    print(user_in_session)
     return jsonify({"username": user_in_session})
 
 
@@ -254,7 +275,6 @@ def get_archived_cards():
 def restore_card():
     card_id = request.get_json()['card_id']
     try:
-        print(data_handler.restore_card(card_id))
         return data_handler.restore_card(card_id)
     except:
         return jsonify({"response": "There was an error during execution of your request"})

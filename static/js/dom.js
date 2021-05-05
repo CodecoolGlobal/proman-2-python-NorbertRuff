@@ -86,7 +86,7 @@ export let dom = {
                     if(status['board_id'] === parseInt(boardID)){
                         columnContent.insertAdjacentHTML('beforeend', `
                         <div class="board-column">
-                        <div class="board-column-title">${status['title']}`+ (status['status_id'] > 3 ? '<i class="column-delete fas fa-trash-alt"></i>': "") + `</div>
+                        <div class="board-column-title custom"><input value="${status['title']}" class="column-title-change hide-element">${status['title']}`+ (status['status_id'] > 3 ? '<i class="column-delete fas fa-trash-alt"></i>': "") + `</div>
                         <div id="status-id-${status['status_id']}" class="board-column-content" data-status-id="${status['status_id']}"></div>
                         </div>`)
                     }
@@ -115,6 +115,7 @@ export let dom = {
             dom.initHeader();
             dom.initCollapseBoard();
             dom.initBoardTitleListeners();
+            dom.initCustomColumnTitleListeners();
             dom.initAddNewColumnListeners();
             dom.initCardEventListeners();
             dom.initDragAndDrop();
@@ -132,6 +133,15 @@ export let dom = {
             let inputField = title.querySelector('input')
             inputField.addEventListener('keydown', dom.initBoardTitleChange)
             inputField.addEventListener('mouseleave', dom.closeInputBoard)
+        }
+    },
+    initCustomColumnTitleListeners: function (){
+        let columnTitles = document.querySelectorAll('.board-column-title.custom');
+        for(let title of columnTitles){
+            title.addEventListener('click', dom.showColumnTitleInput)
+            let inputField = title.querySelector('input')
+            inputField.addEventListener('keydown', dom.initColumnTitleChange)
+            inputField.addEventListener('mouseleave', dom.closeInputColumn)
         }
     },
     showBoards: function (boards) {
@@ -284,6 +294,18 @@ export let dom = {
                 .then((response) => inputField.after(response['title']))
         }
     },
+    closeInputColumn: function (evt){
+        let inputField = evt.target.closest('input');
+        let columnID = inputField.parentElement.parentElement.querySelector('.board-column-content').dataset.statusId;
+        let trashCan = inputField.parentElement.querySelector('.column-delete.fa-trash-alt')
+        trashCan.classList.remove('hide-element');
+        if(!inputField.classList.contains('hide-element')){
+            inputField.closest('.board-column-title').childNodes[1].textContent = '';
+            inputField.classList.add('hide-element');
+            dataHandler.getColumnTitle({'column_id': columnID})
+                .then((response) => inputField.after(response['title']))
+        }
+    },
     closeInput: function (evt){
         let inputField = evt.target.querySelector('input');
         let cardID = inputField.closest('.card').dataset.cardId;
@@ -318,6 +340,19 @@ export let dom = {
             title.childNodes[1].classList.add('display-flex-element');
         }
     },
+    showColumnTitleInput: function (evt){
+        let board = evt.target.closest('.board-column-title');
+        let inputField = board.querySelector('input')
+        if(inputField.classList.contains('hide-element')){
+            let title = inputField.closest('.board-column-title');
+            let trashCan = inputField.parentElement.querySelector('.column-delete.fa-trash-alt')
+            trashCan.classList.add('hide-element');
+            let boardNameNode = title.childNodes[1];
+            title.removeChild(boardNameNode);
+            title.childNodes[0].classList.remove('hide-element');
+            title.childNodes[0].classList.add('display-flex-element');
+        }
+    },
 
     initStatusDeleteBTN: function (){
         let statusDeleteButtons = document.querySelectorAll('.column-delete.fa-trash-alt');
@@ -344,11 +379,19 @@ export let dom = {
     },
 
     discardTitleChange: function (target){
-        let cardID = target.closest('.card').dataset.boardId;
+        let cardID = target.closest('.card').dataset.cardId;
         target.closest('.card-title').childNodes[2].textContent = '';
         target.classList.remove('display-flex-element');
         target.classList.add('hide-element');
             dataHandler.getCardTitle({'card_id': cardID})
+                .then((response) => target.after(response['title']))
+    },
+
+    discardColumnTitleChange: function (target){
+        let columnID = target.parentElement.parentElement.querySelector('.board-column-content').dataset.statusId;
+        target.classList.remove('display-flex-element');
+        target.classList.add('hide-element');
+            dataHandler.getColumnTitle({'column_id': columnID})
                 .then((response) => target.after(response['title']))
     },
 
@@ -392,6 +435,16 @@ export let dom = {
             .then(() => titleInput.classList.remove('display-flex-element'))
     },
 
+    saveColumnTitleChange: function (evt, titleInput){
+        let newTitle = evt.currentTarget.value;
+        let columnID = evt.currentTarget.parentElement.parentElement.querySelector('.board-column-content').dataset.statusId;
+        dataHandler.updateColumnTitle({"column_name": newTitle, "id": columnID})
+            .then(() => titleInput.value = newTitle)
+            .then(() => titleInput.after(newTitle))
+            .then(() => titleInput.classList.add('hide-element'))
+            .then(() => titleInput.classList.remove('display-flex-element'))
+    },
+
     saveTitleChange: function (evt, titleInput) {
         let newTitle = evt.currentTarget.value;
         let cardID = titleInput.closest("[data-card-id]").dataset.cardId;
@@ -408,6 +461,14 @@ export let dom = {
             dom.saveBoardTitleChange(evt, titleInput);
         } else if(evt.key === 'Escape'){
             dom.discardTitleChange(titleInput)
+        }
+    },
+    initColumnTitleChange: function(evt){
+        let titleInput = evt.currentTarget;
+        if(evt.key === 'Enter'){
+            dom.saveColumnTitleChange(evt, titleInput);
+        } else if(evt.key === 'Escape'){
+            dom.discardColumnTitleChange(titleInput)
         }
     },
 

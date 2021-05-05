@@ -230,6 +230,12 @@ section.board-private {
     -moz-box-sizing:border-box;
     padding: 2px;
 }
+.board-column-title>input{
+    width:100%;
+    box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    padding: 2px;
+}
 /*--------------------------modal-----------------------------*/
 .bg-modal {
     display: none;

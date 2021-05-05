@@ -82,9 +82,23 @@ export let dataHandler = {
         });
     })
     },
+    getColumnTitle: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/get-column-title', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
     updateCardTitle: function (data){
         return new Promise ((resolve, reject) => {
             this._api_post('/update-card-title', data,(response) => {
+            resolve(response)
+        });
+    })
+    },
+    updateColumnTitle: function (data){
+        return new Promise ((resolve, reject) => {
+            this._api_post('/update-column-title', data,(response) => {
             resolve(response)
         });
     })
