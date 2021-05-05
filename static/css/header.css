@@ -12,6 +12,20 @@
     display: flex;
     justify-content: center;
 }
+.fa-sync-alt{
+    font-size: 30px;
+}
+.synchronizing{
+    animation: rotate 1s ease-in-out 4 both;
+}
+@keyframes rotate{
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
 .nav-container {
     display: flex;

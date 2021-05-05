@@ -123,8 +123,18 @@ export let dom = {
             dom.setArchiveListener();
             dom.initArchivedCardsButton();
             dom.initStatusDeleteBTN();
+            dom.initSyncBTN();
         })
 
+    },
+    initSyncBTN: function () {
+      let syncButton = document.querySelector('.fa-sync-alt');
+      syncButton.style.cursor = 'pointer';
+      syncButton.addEventListener('click', dom.syncAction);
+    },
+    syncAction: function(event){
+        event.target.classList.add('synchronizing')
+        console.log('Sync')
     },
     initBoardTitleListeners: function (){
         let boardTitles = document.querySelectorAll('.board-title');
