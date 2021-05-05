@@ -1,3 +1,4 @@
+from flask_socketio import SocketIO, emit, send
 from flask import Flask, render_template, redirect, url_for, session, request, jsonify, flash
 from util import json_response
 import password_hasher
@@ -8,6 +9,14 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = "bec725156bb840a9a722fba8b3a7597b"
 
+
+socketio = SocketIO(app)
+
+
+@socketio.on('sync_request')
+def handle_my_custom_event(json):
+    print('received json: ' + str(json))
+    emit('sync_event', str(json), broadcast=True)
 
 @app.route("/")
 def index():
@@ -144,7 +153,6 @@ def get_boards():
     All the boards
     """
     username = session.get('username', None)
-    time.sleep(1)
     return data_handler.get_boards(username)
 
 
@@ -284,11 +292,11 @@ def restore_card():
 
 
 def main():
-    app.run(debug=True)
-
-    # Serving the favicon
-    with app.app_context():
-        app.add_url_rule('/favicon.ico', redirect_to=url_for('static', filename='favicon/favicon.ico'))
+    socketio.run(app, debug=True)
+    # app.run(debug=True)
+    # # Serving the favicon
+    # with app.app_context():
+    #     app.add_url_rule('/favicon.ico', redirect_to=url_for('static', filename='favicon/favicon.ico'))
 
 
 if __name__ == '__main__':

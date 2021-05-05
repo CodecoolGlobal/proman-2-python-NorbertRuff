@@ -1,5 +1,7 @@
 // It uses data_handler.js to visualize elements
 import { dataHandler } from "./data_handler.js";
+const io = window.io;
+const socket = io();
 
 export let dom = {
     // This function should run once, when the page is loaded.
@@ -9,8 +11,26 @@ export let dom = {
         dom.initLoginForm();
         dom.initRegistrationForm();
         dom.initModalClose();
+        dom.connectIo()
+        dom.initSyncListener();
+        dom.initSyncBTN();
     },
+    connectIo: function (event){
+            socket.on('connect', function() {
+                socket.emit('status', {data: 'connected'});
+            });
 
+    },
+    broadcastUpdate: function (event){
+        console.log('sync request received broadcasting')
+        socket.emit('sync_request', {data: 'sync'});
+    },
+    initSyncListener: function (event){
+            socket.on('sync_event', function() {
+                console.log('sync request received')
+                dom.loadBoards();
+            });
+    },
     initNewBoardButtons: function () {
         let addNewPublicBoardButton = document.querySelector("#add_public_board");
         addNewPublicBoardButton.addEventListener('click', dom.initNewBoardCreate);
@@ -52,6 +72,7 @@ export let dom = {
                     dom.loadBoards();
                 })
             dom.closeModal()
+            dom.broadcastUpdate()
         }
     },
 
@@ -97,13 +118,14 @@ export let dom = {
     },
 
     loadBoards: function () {
-        document.querySelector('.fa-sync-alt').classList.add('synchronizing')
+
         // retrieves boards and makes showBoards called
         let promise1 = dataHandler.getBoards()
         let promise2 = dataHandler.getDefaultStatuses()
         let promise3 = dataHandler.getCards()
         let promise4 = dataHandler.getCustomStatuses()
         Promise.all([promise1, promise2, promise3, promise4]).then((data) => {
+            document.querySelector('.fa-sync-alt').classList.add('synchronizing')
             let boards = data[0]
             let defaultStatuses = data[1]
             let cards = data[2]
@@ -124,8 +146,7 @@ export let dom = {
             dom.setArchiveListener();
             dom.initArchivedCardsButton();
             dom.initStatusDeleteBTN();
-            dom.initSyncBTN();
-            document.querySelector('.fa-sync-alt').classList.remove('synchronizing')
+            setTimeout(function(){ document.querySelector('.fa-sync-alt').classList.remove('synchronizing') }, 2000);
         })
 
     },
@@ -137,7 +158,7 @@ export let dom = {
     syncAction: function(event){
         event.target.classList.add('synchronizing')
         dom.loadBoards()
-
+        dom.broadcastUpdate()
     },
     initBoardTitleListeners: function (){
         let boardTitles = document.querySelectorAll('.board-title');
@@ -264,6 +285,7 @@ export let dom = {
                 let boardID = draggable.closest('.board').getAttribute('id').match(/[0-9]+/)[0]
                 let allCardsInStatus = dom.getAllCardsIDFromStatus(draggable)
                 dataHandler.updateCards({'card_id': cardID, 'status_id': statusID, 'board_id': boardID, 'cards_order': allCardsInStatus})
+                dom.broadcastUpdate()
             })
         })
         containers.forEach(container => {
@@ -333,13 +355,19 @@ export let dom = {
         let board = event.target.closest("section");
         let boardId = board.dataset.boardId;
         dataHandler.removeBoard(boardId)
-            .then(() => board.remove())
+            .then(() => {
+                board.remove()
+                dom.broadcastUpdate()
+            })
     },
     deleteCard: function(event){
         let card = event.target.parentElement.parentElement
         let cardId = card.dataset.cardId;
         dataHandler.removeCard(cardId)
-            .then(() => card.remove())
+            .then(() => {
+                card.remove()
+                dom.broadcastUpdate()
+            })
     },
 
     showBoardTitleInput: function (evt){
@@ -378,7 +406,11 @@ export let dom = {
         for (let card of cards.childNodes){
             let cardId = card.dataset.cardId
             dataHandler.removeCard(cardId)
-                .then(() => card.remove())
+                .then(() => {
+                    card.remove()
+                    dom.broadcastUpdate()
+                }
+                )
         }
         dataHandler.removeStatus(cards.dataset.statusId)
             .then(() => event.target.closest('.board-column').remove())
@@ -446,6 +478,7 @@ export let dom = {
             .then(() => titleInput.after(newTitle))
             .then(() => titleInput.classList.add('hide-element'))
             .then(() => titleInput.classList.remove('display-flex-element'))
+            .then(() => dom.broadcastUpdate)
     },
 
     saveColumnTitleChange: function (evt, titleInput){
@@ -456,6 +489,7 @@ export let dom = {
             .then(() => titleInput.after(newTitle))
             .then(() => titleInput.classList.add('hide-element'))
             .then(() => titleInput.classList.remove('display-flex-element'))
+            .then(() => dom.broadcastUpdate)
     },
 
     saveTitleChange: function (evt, titleInput) {
@@ -466,12 +500,14 @@ export let dom = {
         dataHandler.updateCardTitle({'new_title': newTitle, 'card_id': cardID})
             .then(() => titleInput.classList.add('hide-element'))
             .then(() => titleInput.classList.remove('display-flex-element'))
+            .then(() => dom.broadcastUpdate)
     },
 
     initBoardTitleChange: function(evt){
         let titleInput = evt.currentTarget;
         if(evt.key === 'Enter'){
             dom.saveBoardTitleChange(evt, titleInput);
+            dom.broadcastUpdate()
         } else if(evt.key === 'Escape'){
             dom.discardTitleChange(titleInput)
         }
@@ -480,6 +516,7 @@ export let dom = {
         let titleInput = evt.currentTarget;
         if(evt.key === 'Enter'){
             dom.saveColumnTitleChange(evt, titleInput);
+            dom.broadcastUpdate()
         } else if(evt.key === 'Escape'){
             dom.discardColumnTitleChange(titleInput)
         }
@@ -489,6 +526,7 @@ export let dom = {
         let titleInput = evt.currentTarget;
         if(evt.key === 'Enter'){
             dom.saveTitleChange(evt, titleInput);
+            dom.broadcastUpdate()
         } else if(evt.key === 'Escape'){
             dom.discardTitleChange(titleInput)
         }
@@ -510,6 +548,7 @@ export let dom = {
                 .then(dom.loadBoards);
             }
             dom.closeModal()
+            dom.broadcastUpdate()
             }
         },
 
@@ -544,7 +583,10 @@ export let dom = {
             let customTitle = document.querySelector('#new_title')
                 dom.addNewCardToBoard(customTitle.value, cardContainers);
                 dom.closeModal()
-                dataHandler.createNewCard(boardId, customTitle.value, statusId, cardOrder).then(dom.loadBoards)
+                dataHandler.createNewCard(boardId, customTitle.value, statusId, cardOrder)
+                    .then(dom.loadBoards)
+                    .then(dom.broadcastUpdate)
+
             }
          },
          addNewCardToBoard: function(customTitle, cardContainers) {
