@@ -1,5 +1,6 @@
 // It uses data_handler.js to visualize elements
 import { dataHandler } from "./data_handler.js";
+
 const io = window.io;
 const socket = io();
 
@@ -27,7 +28,7 @@ export let dom = {
     },
     initSyncListener: function (event){
             socket.on('sync_event', function() {
-                console.log('sync request received')
+                console.log('sync request received syncing')
                 dom.loadBoards();
             });
     },
@@ -146,7 +147,7 @@ export let dom = {
             dom.setArchiveListener();
             dom.initArchivedCardsButton();
             dom.initStatusDeleteBTN();
-            setTimeout(function(){ document.querySelector('.fa-sync-alt').classList.remove('synchronizing') }, 2000);
+            setTimeout(function(){ document.querySelector('.fa-sync-alt').classList.remove('synchronizing') }, 1000);
         })
 
     },

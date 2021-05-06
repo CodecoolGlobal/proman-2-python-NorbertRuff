@@ -3,7 +3,7 @@
 }
 
 .nav {
-    box-sizing: border;
+    box-sizing: border-box;
     width: 100%;
     background-color: rgba(255, 255, 255, 0.8);
     position: relative;
@@ -11,12 +11,13 @@
     filter: drop-shadow(0 2mm 2mm rgba(0, 0, 0, 0.1));
     display: flex;
     justify-content: center;
+
 }
 .fa-sync-alt{
     font-size: 30px;
 }
 .synchronizing{
-    animation: rotate 1s ease-in-out 4 both;
+    animation: rotate 1s ease-in-out infinite both;
 }
 @keyframes rotate{
   0% {
@@ -35,7 +36,7 @@
     padding: 0 25px;
 }
 
-.nav > .nav-title {
+.nav-container> .nav-title {
     display: flex;
     align-items: center;
     font-size: 22px;
@@ -44,8 +45,10 @@
     height: 50px;
     vertical-align: center;
 }
-
-.nav > .nav-links {
+.fa-sync-alt{
+    margin-left: 10px;
+}
+.nav-container> .nav-links {
   display: flex;
   float: right;
   font-size: 14px;

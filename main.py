@@ -2,7 +2,6 @@ from flask_socketio import SocketIO, emit, send
 from flask import Flask, render_template, redirect, url_for, session, request, jsonify, flash
 from util import json_response
 import password_hasher
-import time
 import data_handler
 
 app = Flask(__name__)
@@ -294,9 +293,9 @@ def restore_card():
 def main():
     socketio.run(app, debug=True)
     # app.run(debug=True)
-    # # Serving the favicon
-    # with app.app_context():
-    #     app.add_url_rule('/favicon.ico', redirect_to=url_for('static', filename='favicon/favicon.ico'))
+    # Serving the favicon
+    with app.app_context():
+        app.add_url_rule('/favicon.ico', redirect_to=url_for('static', filename='favicon/favicon.ico'))
 
 
 if __name__ == '__main__':
